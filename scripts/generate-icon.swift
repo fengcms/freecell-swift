@@ -24,7 +24,11 @@ func render(pixels: Int) throws -> Data {
     guard let data = bitmap.representation(using: .png, properties: [:]) else { throw CocoaError(.fileWriteUnknown) }
     return data
 }
-try render(pixels: 1024).write(to: root.appendingPathComponent("App/icon-1024.png"))
+let preview = try render(pixels: 1024)
+try preview.write(to: root.appendingPathComponent("App/icon-1024.png"))
+try preview.write(to: root.appendingPathComponent("Sources/FreeCellApp/Resources/AppIcon.png"))
+let attribution = try Data(contentsOf: root.appendingPathComponent("App/IconSources/ATTRIBUTION.txt"))
+try attribution.write(to: root.appendingPathComponent("Sources/FreeCellApp/Resources/Icon-Attribution.txt"))
 let iconset = root.appendingPathComponent("build/FreeCell.iconset")
 try FileManager.default.createDirectory(at: iconset, withIntermediateDirectories: true)
 for size in [16, 32, 128, 256, 512] {

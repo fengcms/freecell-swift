@@ -97,3 +97,7 @@ docs/                         规则、设计、资源清单与验收记录
 ### 应用图标
 
 应用使用 [Lorc 的 Poker Hand 图标](https://game-icons.net/1x1/lorc/poker-hand.html)，许可为 [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/)，搭配深绿色圆角背景。署名与改动说明见 `App/IconSources/ATTRIBUTION.txt`，也随应用打包。运行 `swift scripts/generate-icon.swift` 可重新生成预览与全部 macOS 图标尺寸。
+
+### Dock 图标（1.3.2）
+
+启动时通过 AppKit 显式设置应用图标。打包应用加载 `FreeCell.icns`，直接运行 SwiftPM 可执行文件时加载其资源包中的 `AppIcon.png`。两种启动方式均携带图标和署名，避免调试程序在 Dock 中显示默认占位图。更新后需退出已有实例，再打开 `build/FreeCell.app`。

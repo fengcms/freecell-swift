@@ -37,6 +37,14 @@ struct FreeCellApp: App {
 @MainActor
 final class FreeCellDelegate: NSObject, NSApplicationDelegate {
     weak var session: GameSession?
+    func applicationDidFinishLaunching(_ notification: Notification) {
+        // SwiftPM executables have no application Info.plist. Set the Dock icon for both launch paths.
+        let iconURL = Bundle.main.url(forResource: "FreeCell", withExtension: "icns")
+            ?? Bundle.module.url(forResource: "AppIcon", withExtension: "png")
+        if let iconURL, let icon = NSImage(contentsOf: iconURL) {
+            NSApplication.shared.applicationIconImage = icon
+        }
+    }
     func applicationShouldTerminate(_ sender: NSApplication) -> NSApplication.TerminateReply {
         guard let session else { return .terminateNow }
         Task {

@@ -1,0 +1,15 @@
+FreeCell application icon
+
+Artwork: Poker Hand
+Author: Lorc (https://lorcblog.blogspot.com/)
+Source: https://game-icons.net/1x1/lorc/poker-hand.html
+Original PNG: https://game-icons.net/icons/ffffff/transparent/1x1/lorc/poker-hand.png
+License: Creative Commons Attribution 3.0 Unported (CC BY 3.0)
+License URL: https://creativecommons.org/licenses/by/3.0/
+
+Adaptation: resized and placed on a dark green rounded square background
+for the FreeCell macOS application. No endorsement by the original author
+is implied. The original artwork is included in App/IconSources/poker-hand.png.
+
+Regenerate all macOS icon sizes and the ICNS file from the repository root:
+    swift scripts/generate-icon.swift
