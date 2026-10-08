@@ -128,7 +128,7 @@ docs/                         规则、设计、资源清单与验收记录
 
 源码使用 [MIT 许可证](LICENSE)，第三方素材按各自许可分发。作者：Fungleo；签名：键鼠请游戏人间 风流谈笑傲江湖；[个人博客](http://fungleo.com)。
 
-可通过 [GitHub Releases](https://github.com/fengcms/freecell-swift/releases) 分发独立应用，无需 Apple 开发者会员。[1.6.0 下载页](https://github.com/fengcms/freecell-swift/releases/tag/v1.6.0)提供 `FreeCell-1.6.0-macOS-AppleSilicon.zip` 和 SHA-256 校验文件。请下载 Release 的应用附件，GitHub 的 Source code 压缩包是源码，不能直接运行。
+可通过 [GitHub Releases](https://github.com/fengcms/freecell-swift/releases) 分发独立应用，无需 Apple 开发者会员。[1.6.0 下载页](https://github.com/fengcms/freecell-swift/releases/tag/v1.6.0)提供 `FreeCell-1.6.0-macOS-AppleSilicon.dmg` 安装镜像、ZIP 备用包和 SHA-256 校验文件。打开 DMG 后将 FreeCell 拖入“应用程序”即可安装；GitHub 的 Source code 压缩包是源码，不能直接运行。
 
 下载后解压，将 FreeCell.app 拖入“应用程序”后打开。应用使用临时签名，未经 Apple Developer ID 签名与公证；若首次打开被阻止，在确认下载自本仓库正式 Release 后，进入“系统设置 → 隐私与安全性”，点击“仍要打开”，按系统提示确认。详见 [Apple 首次打开说明](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac)。不需要关闭 Gatekeeper。
 
