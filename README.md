@@ -1,5 +1,7 @@
 # 空当接龙 · FreeCell
 
+默认中文说明文档。游戏支持九种语言，可在设置中切换。
+
 使用 Swift 6、SwiftUI 工具栏与 AppKit 牌桌编写的原生 macOS 纸牌游戏，仅支持搭载 M 系列芯片的 Apple Silicon Mac（arm64），要求 macOS 14 及以上；不提供 Intel Mac 或 Windows 版本。
 
 ## 运行
@@ -42,12 +44,13 @@ open build/FreeCell.app
 ```sh
 swift run FreeCellChecks
 swift run -c release FreeCellChecks
+./scripts/check-localization.sh
 swift build --product FreeCell
 ./scripts/build-app.sh
 codesign --verify --deep --strict build/FreeCell.app
 ```
 
-规则验证程序位于 `Tests/FreeCellCoreTests`，失败返回非零退出码；覆盖合法／非法移动、容量边界、单牌拆解证明、固定洗牌结果、52张牌完整胜利流程、历史分支、存档往返及损坏数据，以及双击优先级、基础堆取回、窗口布局边界、收牌动画顺序及整组动画坐标，共29组检查。当前机器不包含 Swift Testing/XCTest 模块，因此使用不依赖测试框架的独立验证目标 `FreeCellChecks`，不用 `swift test`。没有为此引入网络依赖或安装 Xcode。
+规则验证程序位于 `Tests/FreeCellCoreTests`，失败返回非零退出码；覆盖合法／非法移动、容量边界、单牌拆解证明、固定洗牌结果、52张牌完整胜利流程、历史分支、存档往返及损坏数据，以及双击优先级、基础堆取回、窗口布局边界、收牌动画顺序及整组动画坐标，共31组检查。当前机器不包含 Swift Testing/XCTest 模块，因此使用不依赖测试框架的独立验证目标 `FreeCellChecks`，不用 `swift test`。没有为此引入网络依赖或安装 Xcode。
 
 界面验证可在独立临时存档中启动：
 
@@ -83,6 +86,7 @@ docs/                         规则、设计、资源清单与验收记录
 - [首版实现与验收记录](docs/04-实现与验收记录.md)
 - [1.1交互调整与验收记录](docs/05-交互调整与验收记录.md)
 - [1.2动画与全屏验收记录](docs/06-动画与全屏验收记录.md)
+- [多语言支持与验收](docs/10-多语言支持与验收.md)
 - [牌面映射清单](docs/card-resources.json)
 - [52张牌面预览](docs/previews/deck-contact-sheet.jpg)
 
@@ -120,12 +124,18 @@ docs/                         规则、设计、资源清单与验收记录
 
 已使用独立验证实例检查回车确认新局和重开、⌘C 取消新局、Esc 取消重开；取消后原牌局编号保留。关于窗口的文字和链接已完成界面检查，最终 Release 应用已打包并验证签名。
 
-### 发布准备（1.5.0）
+### 发布准备（1.6.0）
 
 源码使用 [MIT 许可证](LICENSE)，第三方素材按各自许可分发。作者：Fungleo；签名：键鼠请游戏人间 风流谈笑傲江湖；[个人博客](http://fungleo.com)。
 
-可通过 [GitHub Releases](https://github.com/fengcms/freecell-swift/releases) 分发独立应用，无需 Apple 开发者会员。[1.5.0 下载页](https://github.com/fengcms/freecell-swift/releases/tag/v1.5.0)提供 `FreeCell-1.5.0-macOS-AppleSilicon.zip` 和 SHA-256 校验文件。请下载 Release 的应用附件，GitHub 的 Source code 压缩包是源码，不能直接运行。
+可通过 [GitHub Releases](https://github.com/fengcms/freecell-swift/releases) 分发独立应用，无需 Apple 开发者会员。[1.6.0 下载页](https://github.com/fengcms/freecell-swift/releases/tag/v1.6.0)提供 `FreeCell-1.6.0-macOS-AppleSilicon.zip` 和 SHA-256 校验文件。请下载 Release 的应用附件，GitHub 的 Source code 压缩包是源码，不能直接运行。
 
 下载后解压，将 FreeCell.app 拖入“应用程序”后打开。应用使用临时签名，未经 Apple Developer ID 签名与公证；若首次打开被阻止，在确认下载自本仓库正式 Release 后，进入“系统设置 → 隐私与安全性”，点击“仍要打开”，按系统提示确认。详见 [Apple 首次打开说明](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac)。不需要关闭 Gatekeeper。
 
 发布前检查、安装说明和版本发布文案见 [GitHub 发布准备](docs/09-GitHub发布准备.md)。牌面采用已确认的浅暖渐变纸色、加粗留白角标；数字牌中央图案相对原版缩小12%，A及人物牌使用独立比例，J/Q/K居中放大并去掉人物外围黑框，以兼顾完整牌面和正常叠放时的头部可见性；角标梅花采用标准三瓣形。重新生成牌面仅开发时需要 Python 3、Node.js 与 sharp：`npm install --prefix /tmp/freecell-card-tools sharp`，然后依次运行 `SHARP_MODULE=/tmp/freecell-card-tools/node_modules/sharp python3 scripts/style-cards.py` 和 `SHARP_MODULE=/tmp/freecell-card-tools/node_modules/sharp node scripts/generate-cards.cjs`。正常构建和运行不依赖 Node.js。
+
+### 多语言（1.6.0）
+
+支持 English、简体中文、繁體中文、Français、Deutsch、Español、العربية、日本語、한국어。通过 ⌘, 打开设置，在“界面 → 语言”选择；默认跟随系统首选语言，不受支持时使用英语。选择立即生效并在重启后保留，已有牌局存档继续兼容。
+
+主界面、菜单、对话框、规则、状态、错误提示、关于游戏和辅助功能牌名均提供翻译。阿拉伯语使用从右向左的文字布局，牌桌列顺序保持一致。README 默认使用简体中文。1.6.0 在此版本加入九种界面语言；版本包提供 Apple Silicon Mac 下载。

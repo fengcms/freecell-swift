@@ -4,7 +4,7 @@ import FreeCellPresentation
 
 @MainActor @Observable
 final class AppSettings {
-    var values: GamePreferences { didSet { save(); onChange?() } }
+    var values: GamePreferences { didSet { GameLocalization.shared.choice = values.language; save(); onChange?() } }
     var saveError: String?
     @ObservationIgnored var onChange: (() -> Void)?
     @ObservationIgnored private let defaults: UserDefaults
@@ -15,6 +15,7 @@ final class AppSettings {
         if let data = defaults.data(forKey: Self.key), let saved = try? JSONDecoder().decode(GamePreferences.self, from: data) {
             values = saved
         } else { values = GamePreferences() }
+        GameLocalization.shared.choice = values.language
     }
     private func save() {
         do { defaults.set(try JSONEncoder().encode(values), forKey: Self.key); saveError = nil }
@@ -26,7 +27,11 @@ final class AppSettings {
             let index = arguments.firstIndex(of: "--verification-directory")
             let folder = index.flatMap { arguments.indices.contains($0 + 1) ? arguments[$0 + 1] : nil } ?? "default"
             let suffix = Data(folder.utf8).base64EncodedString()
-            return AppSettings(defaults: UserDefaults(suiteName: "local.fungleo.FreeCell.verification." + suffix) ?? .standard)
+            let settings = AppSettings(defaults: UserDefaults(suiteName: "local.fungleo.FreeCell.verification." + suffix) ?? .standard)
+            if let index = arguments.firstIndex(of: "--verification-language"), arguments.indices.contains(index + 1),
+               let language = GameLanguage(rawValue: arguments[index + 1]) { settings.values.language = language }
+            if arguments.contains("--verification-silent") { settings.values.backgroundMusic = false; settings.values.moveSound = false }
+            return settings
         }
         return AppSettings(defaults: UserDefaults(suiteName: "local.fungleo.FreeCell.preferences") ?? .standard)
     }

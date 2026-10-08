@@ -7,12 +7,12 @@ enum ResetConfirmation {
               parent.attachedSheet == nil else { return }
         let alert = NSAlert()
         alert.messageText = title
-        alert.informativeText = "当前进度及撤销历史将被清除。"
+        alert.informativeText = L("当前进度及撤销历史将被清除。")
         alert.alertStyle = .warning
-        let confirm = alert.addButton(withTitle: "确定")
+        let confirm = alert.addButton(withTitle: L("确定"))
         confirm.keyEquivalent = "\r"
         confirm.keyEquivalentModifierMask = []
-        let cancel = alert.addButton(withTitle: "取消")
+        let cancel = alert.addButton(withTitle: L("取消"))
         cancel.keyEquivalent = "\u{1b}"
         cancel.keyEquivalentModifierMask = []
         // Handle the extra cancel shortcut only while this sheet is the event's window.

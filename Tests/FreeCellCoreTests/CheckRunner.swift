@@ -73,6 +73,7 @@ struct CheckRunner {
             ("双击目标优先级与最左目标", doubleClickPriority),
             ("双击整组及无目标", doubleClickGroupsAndNoTarget),
             ("基础堆取回历史与存档", returnedFoundationHistoryPersists),
+            ("双击完整按下抬起时间边界", clickTimingBoundaries),
             ("窗口比例及52张极长列完整适配", boardFitsEveryWindow),
             ("牌宽固定、底部预留及各列独立压缩", cardSizeStableAndColumnsCompressIndependently),
             ("绘制命中一致及牌龙拖动边界", boardHitTestingAndDragBounds),
@@ -80,6 +81,7 @@ struct CheckRunner {
             ("收牌动画序列顺序与终点", collectionTimelineAndBoundaries),
             ("动画坐标及窗口边界", collectionFlightCoordinates),
             ("整组动画保持牌龙间距", groupAnimationPreservesDragon),
+            ("语言解析、默认回退及旧偏好兼容", languageResolutionAndMigration),
             ("设置默认值、编码恢复及兼容", preferencesDefaultsAndRoundTrip),
             ("四档动画速度及关闭动画边界", animationSpeedTimelines)
         ]

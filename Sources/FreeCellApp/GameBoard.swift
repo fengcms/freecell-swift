@@ -48,7 +48,7 @@ final class BoardSurface: NSView {
     private var press: Press?
     private var drag: Drag?
     private var clickTask: Task<Void, Never>?
-    private var pendingClick: (Item, Int)?
+    private var pendingClick: (Item, Int, TimeInterval)?
     private var feedbackTask: Task<Void, Never>?
     private var feedbackCardID: Int?
     private var feedbackStart: TimeInterval = 0
@@ -68,12 +68,14 @@ final class BoardSurface: NSView {
         let location: Location
         let frame: CGRect
         let visibleHeight: CGFloat
+        var visibleFrame: CGRect { CGRect(x: frame.minX, y: frame.minY, width: frame.width, height: visibleHeight) }
         var key: String { card.map { "card-\($0.id)" } ?? "slot-\(location)" }
     }
     private struct Press {
         let item: Item
         let point: CGPoint
-        let doubleClick: Bool
+        let previousClick: (Item, Int, TimeInterval)?
+        let timestamp: TimeInterval
     }
     private struct Drag {
         let selected: CardSelection
@@ -275,28 +277,30 @@ final class BoardSurface: NSView {
     override func mouseDown(with event: NSEvent) {
         guard enabled, motion == nil else { return }
         let point = convert(event.locationInWindow, from: nil)
-        guard let item = items.reversed().first(where: { $0.frame.contains(point) }) else {
+        guard let item = items.reversed().first(where: { $0.visibleFrame.contains(point) }) else {
             cancelInteraction(); focusedIndex = nil; onCancel?(); return
         }
         if item.card == nil && selection == nil {
             cancelInteraction(); focusedIndex = nil; onCancel?(); return
         }
+        var previousClick: (Item, Int, TimeInterval)?
         if let pending = pendingClick {
             clickTask?.cancel(); clickTask = nil; pendingClick = nil
-            if event.clickCount != 2 || automaticMoveGesture != .doubleClick || pending.0.key != item.key {
-                if pending.1 == version { activate(pending.0) }
-            }
+            if automaticMoveGesture == .doubleClick && pending.0.key == item.key &&
+                ClickTiming.isDoubleClick(firstDown: pending.2, secondUp: event.timestamp, interval: NSEvent.doubleClickInterval) {
+                previousClick = pending
+            } else if pending.1 == version { activate(pending.0) }
         }
         window?.makeFirstResponder(self)
         focusedIndex = items.firstIndex(where: { $0.key == item.key }) ?? 0
-        press = Press(item: item, point: point, doubleClick: event.clickCount == 2 && automaticMoveGesture == .doubleClick)
+        press = Press(item: item, point: point, previousClick: previousClick, timestamp: event.timestamp)
         needsDisplay = true
     }
     override func rightMouseDown(with event: NSEvent) {
         guard enabled, motion == nil, automaticMoveGesture == .rightClick else { return }
         cancelInteraction()
         let point = convert(event.locationInWindow, from: nil)
-        guard let item = items.reversed().first(where: { $0.frame.contains(point) }), let card = item.card else {
+        guard let item = items.reversed().first(where: { $0.visibleFrame.contains(point) }), let card = item.card else {
             focusedIndex = nil; onCancel?(); return
         }
         window?.makeFirstResponder(self)
@@ -331,12 +335,20 @@ final class BoardSurface: NSView {
             needsDisplay = true
             return
         }
-        guard press.item.frame.contains(convert(event.locationInWindow, from: nil)) else { return }
-        if press.doubleClick, let card = press.item.card {
+        let releasedInside = press.item.visibleFrame.contains(convert(event.locationInWindow, from: nil))
+        if let previous = press.previousClick {
+            guard previous.1 == version else { return }
+            if !releasedInside || !ClickTiming.isDoubleClick(firstDown: previous.2, secondUp: event.timestamp, interval: NSEvent.doubleClickInterval) {
+                activate(previous.0)
+                return
+            }
+        }
+        guard releasedInside else { return }
+        if press.previousClick != nil, let card = press.item.card {
             if onDoubleClick?(card.id) != true { shake(card.id) }
         } else {
             let expectedVersion = version
-            pendingClick = (press.item, expectedVersion)
+            pendingClick = (press.item, expectedVersion, press.timestamp)
             // Delay the commit so the first click of a double-click cannot perform a separate move.
             clickTask = Task { [weak self] in
                 do { try await Task.sleep(for: .seconds(NSEvent.doubleClickInterval)) } catch { return }
@@ -451,7 +463,7 @@ final class BoardSurface: NSView {
 
     private func refreshAccessibility() {
         setAccessibilityElement(false)
-        setAccessibilityLabel("空当接龙牌桌")
+        setAccessibilityLabel(L("空当接龙牌桌"))
         let children = items.map { item in
             let element = accessibleCards[item.key] ?? BoardAccessibilityElement { [weak self] in
                 guard let self, let current = self.items.first(where: { $0.key == item.key }) else { return }
@@ -460,10 +472,10 @@ final class BoardSurface: NSView {
             accessibleCards[item.key] = element
             element.setAccessibilityRole(.button)
             element.setAccessibilityParent(self)
-            element.setAccessibilityLabel(item.card.map { $0.name + "，" + item.location.name } ?? item.location.name + "，空")
-            element.setAccessibilityHelp("空格选牌或移动；回车按优先顺序自动移动")
+            element.setAccessibilityLabel(item.card.map { localized($0.name) + ", " + localized(item.location.name) } ?? localized(item.location.name) + ", " + L("空"))
+            element.setAccessibilityHelp(L("空格选牌或移动；回车按优先顺序自动移动"))
             element.setAccessibilityEnabled(enabled && motion == nil)
-            let visible = CGRect(x: item.frame.minX, y: item.frame.minY, width: item.frame.width, height: item.visibleHeight)
+            let visible = item.visibleFrame
             element.setAccessibilityFrame(window?.convertToScreen(convert(visible, to: nil)) ?? .zero)
             return element
         }

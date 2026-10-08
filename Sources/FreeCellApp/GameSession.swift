@@ -30,6 +30,7 @@ final class GameSession {
     var recoveryMessage: String?
     private(set) var saveError: String?
     private let saveURL: URL
+    private var archiveWritesBlocked = false
     private let writer = SaveWriter()
     private var revision = 0
     private var lastTick = ProcessInfo.processInfo.systemUptime
@@ -49,7 +50,8 @@ final class GameSession {
         set { settings.values.autoCollect = newValue }
     }
 
-    init(settings: AppSettings) {
+    init(settings: AppSettings, saveURL overrideURL: URL? = nil,
+         backupArchive: (URL, URL) throws -> Void = { try FileManager.default.moveItem(at: $0, to: $1) }) {
         self.settings = settings
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
             ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support")
@@ -61,8 +63,8 @@ final class GameSession {
         } else {
             verificationFolder = FileManager.default.temporaryDirectory.appendingPathComponent("FreeCell-Verification")
         }
-        saveURL = verification ? verificationFolder.appendingPathComponent("game-v1.json")
-            : base.appendingPathComponent("FreeCell-Swift/game-v1.json")
+        saveURL = overrideURL ?? (verification ? verificationFolder.appendingPathComponent("game-v1.json")
+            : base.appendingPathComponent("FreeCell-Swift/game-v1.json"))
         // A generated deck is structurally valid by construction; handle initialization without force unwraps.
         do { archive = try GameArchive(seed: UInt64.random(in: 1...UInt64.max)) }
         catch { fatalError("Internal deck construction failed: \(error)") }
@@ -76,10 +78,11 @@ final class GameSession {
             } catch {
                 let backup = saveURL.deletingLastPathComponent().appendingPathComponent("unreadable-\(UUID().uuidString).json")
                 do {
-                    try FileManager.default.moveItem(at: saveURL, to: backup)
+                    try backupArchive(saveURL, backup)
                     recoveryMessage = "无法恢复原存档，已在存档目录保留备份。现在显示新牌局。"
                 } catch {
                     recoveryMessage = "无法恢复或备份原存档，自动保存已停止。可以在存档目录检查文件。"
+                    archiveWritesBlocked = true
                     saveError = "原存档无法备份，暂停自动保存。"
                 }
                 logger.error("Archive recovery failed")
@@ -92,9 +95,10 @@ final class GameSession {
         applySettings()
     }
     func applySettings() {
+        let archivePreferenceChanged = archive.autoCollect != settings.values.autoCollect
         archive.autoCollect = settings.values.autoCollect
         audio.update(preferences: settings.values, active: active, paused: paused)
-        persist()
+        if archivePreferenceChanged { persist() }
     }
     func startAudio() { audio.update(preferences: settings.values, active: active, paused: paused) }
     private func playMoveSound() { audio.playMove(preferences: settings.values, active: active, paused: paused) }
@@ -208,7 +212,7 @@ final class GameSession {
     private func report(_ error: Error) { message = (error as? GameError)?.message ?? "操作失败，请重试。" }
     func saveBeforeQuit() async -> Bool {
         tick()
-        guard saveError != "原存档无法备份，暂停自动保存。" else { return false }
+        guard !archiveWritesBlocked else { return false }
         do {
             let data = try JSONEncoder().encode(archive)
             revision += 1
@@ -222,7 +226,7 @@ final class GameSession {
     }
 
     func persist() {
-        guard saveError != "原存档无法备份，暂停自动保存。" else { return }
+        guard !archiveWritesBlocked else { return }
         do {
             let data = try JSONEncoder().encode(archive)
             revision += 1

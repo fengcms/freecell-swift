@@ -33,6 +33,17 @@ func boardHitTestingAndDragBounds() throws {
         let column = layout.columnFrame(index, cardCount: 13)
         try expect(layout.dropTarget(at: CGPoint(x: column.midX, y: column.maxY - 1)) == .tableau(index))
     }
+    for count in [7, 13, 52] {
+        let compressed = BoardLayout(size: size, maximumColumnCount: count)
+        let frames = (0..<count).map { compressed.cardFrame(column: 0, offset: $0) }
+        for index in 0..<count {
+            let exposedHeight = index == count - 1 ? compressed.cardSize.height : compressed.spacing(for: 0)
+            for fraction in [0.001, 0.5, 0.999] {
+                let point = CGPoint(x: frames[index].midX, y: frames[index].minY + exposedHeight * fraction)
+                try expect(frames.indices.reversed().first { frames[$0].contains(point) } == index)
+            }
+        }
+    }
     try expect(layout.dropTarget(at: CGPoint(x: -10, y: -10)) == nil)
     for count in [1, 7, 13] {
         for point in [CGPoint(x: -100, y: -100), CGPoint(x: 5000, y: 5000)] {
@@ -59,4 +70,11 @@ func cardSizeStableAndColumnsCompressIndependently() throws {
         try expect(reserve >= initial.cardSize.width * 0.30 * 6 - 0.001)
         try expect(abs(initial.cornerRadius / initial.cardSize.width - 6.87 / 167.0869141) < 0.0001)
     }
+}
+
+func clickTimingBoundaries() throws {
+    try expect(ClickTiming.isDoubleClick(firstDown: 10, secondUp: 10.49, interval: 0.5))
+    try expect(ClickTiming.isDoubleClick(firstDown: 10, secondUp: 10.5, interval: 0.5))
+    try expect(!ClickTiming.isDoubleClick(firstDown: 10, secondUp: 10.51, interval: 0.5))
+    try expect(!ClickTiming.isDoubleClick(firstDown: 10, secondUp: 9, interval: 0.5))
 }

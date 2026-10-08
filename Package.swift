@@ -10,7 +10,7 @@ let package = Package(
         .target(name: "FreeCellCore"),
         .target(name: "FreeCellPresentation", dependencies: ["FreeCellCore"]),
         .executableTarget(name: "FreeCellApp", dependencies: ["FreeCellCore", "FreeCellPresentation"],
-                          resources: [.copy("Resources/Cards"), .copy("Resources/Audio"), .copy("Resources/AppIcon.png"), .copy("Resources/Icon-Attribution.txt")]),
+                          resources: [.copy("Resources/Translations.json"), .copy("Resources/Cards"), .copy("Resources/Audio"), .copy("Resources/AppIcon.png"), .copy("Resources/Icon-Attribution.txt")]),
         .executableTarget(name: "FreeCellChecks", dependencies: ["FreeCellCore", "FreeCellPresentation"], path: "Tests/FreeCellCoreTests")
     ]
 )
