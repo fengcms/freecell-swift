@@ -3,16 +3,20 @@ import SwiftUI
 
 @main
 struct FreeCellApp: App {
-    @State private var session = GameSession()
+    @State private var session: GameSession
+    init() { _session = State(initialValue: GameSession(settings: AppSettings.forCurrentLaunch())) }
     @NSApplicationDelegateAdaptor(FreeCellDelegate.self) private var delegate
     var body: some Scene {
         Window(ProcessInfo.processInfo.arguments.contains("--verification") ? "空当接龙 · 验证" : "空当接龙", id: "game") {
             GameView(session: session)
                 .frame(minWidth: 760, minHeight: 620)
-                .onAppear { delegate.session = session; NSApplication.shared.setActivationPolicy(.regular); NSApplication.shared.activate(ignoringOtherApps: true) }
+                .onAppear { delegate.session = session; session.connectSettings(); session.startAudio(); NSApplication.shared.setActivationPolicy(.regular); NSApplication.shared.activate(ignoringOtherApps: true) }
         }
         .defaultSize(width: 1120, height: 820)
         .commands {
+            CommandGroup(replacing: .appInfo) {
+                Button("关于空当接龙") { AboutGame.show() }
+            }
             CommandGroup(replacing: .undoRedo) {
                 Button("撤销") { session.undo() }.keyboardShortcut("z").disabled(!session.canUndo || session.paused)
                 Button("重做") { session.redo() }.keyboardShortcut("z", modifiers: [.command, .shift]).disabled(!session.canRedo || session.paused)
@@ -22,6 +26,9 @@ struct FreeCellApp: App {
                     .keyboardShortcut("f", modifiers: [.control, .command])
             }
             CommandMenu("牌局") {
+                Button("重新开始本局") { GameCommand.restart.send() }.keyboardShortcut("r")
+                Button("规则") { GameCommand.rules.send() }.keyboardShortcut("/")
+                Divider()
                 Button("提示") { session.showHint() }.keyboardShortcut("h", modifiers: [.command, .shift]).disabled(session.paused)
                 Button("安全收牌") { session.collect() }.keyboardShortcut("k").disabled(session.paused)
                 Button(session.paused ? "继续" : "暂停") { session.togglePause() }.keyboardShortcut("p")
@@ -29,8 +36,11 @@ struct FreeCellApp: App {
                 Divider()
                 Button("打开存档目录") { session.revealSaveFolder() }
             }
-            CommandGroup(replacing: .newItem) { }
+            CommandGroup(replacing: .newItem) {
+                Button("新建牌局") { GameCommand.newGame.send() }.keyboardShortcut("n")
+            }
         }
+        Settings { SettingsView(settings: session.settings) }
     }
 }
 
@@ -40,7 +50,7 @@ final class FreeCellDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // SwiftPM executables have no application Info.plist. Set the Dock icon for both launch paths.
         let iconURL = Bundle.main.url(forResource: "FreeCell", withExtension: "icns")
-            ?? Bundle.module.url(forResource: "AppIcon", withExtension: "png")
+            ?? GameResources.bundle.url(forResource: "AppIcon", withExtension: "png")
         if let iconURL, let icon = NSImage(contentsOf: iconURL) {
             NSApplication.shared.applicationIconImage = icon
         }
@@ -63,3 +73,9 @@ final class FreeCellDelegate: NSObject, NSApplicationDelegate {
     }
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool { true }
 }
+
+// Menus and board buttons share the same confirmation and sheet paths.
+enum GameCommand { case newGame, restart, rules
+    func send() { NotificationCenter.default.post(name: .freeCellCommand, object: self) }
+}
+extension Notification.Name { static let freeCellCommand = Notification.Name("FreeCell.command") }

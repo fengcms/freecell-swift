@@ -17,6 +17,8 @@ private actor SaveWriter {
 
 @MainActor @Observable
 final class GameSession {
+    let settings: AppSettings
+    private let audio = GameAudio()
     private(set) var archive: GameArchive
     private(set) var boardVersion = 0
     private(set) var animationRequest: BoardAnimationRequest?
@@ -43,11 +45,12 @@ final class GameSession {
         return String(format: "%02d:%02d:%02d", seconds / 3600, (seconds / 60) % 60, seconds % 60)
     }
     var autoCollect: Bool {
-        get { archive.autoCollect }
-        set { archive.autoCollect = newValue; persist() }
+        get { settings.values.autoCollect }
+        set { settings.values.autoCollect = newValue }
     }
 
-    init() {
+    init(settings: AppSettings) {
+        self.settings = settings
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask).first
             ?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support")
         let verification = ProcessInfo.processInfo.arguments.contains("--verification")
@@ -84,6 +87,18 @@ final class GameSession {
         }
     }
 
+    func connectSettings() {
+        settings.onChange = { [weak self] in self?.applySettings() }
+        applySettings()
+    }
+    func applySettings() {
+        archive.autoCollect = settings.values.autoCollect
+        audio.update(preferences: settings.values, active: active, paused: paused)
+        persist()
+    }
+    func startAudio() { audio.update(preferences: settings.values, active: active, paused: paused) }
+    private func playMoveSound() { audio.playMove(preferences: settings.values, active: active, paused: paused) }
+
     func tick() {
         let now = ProcessInfo.processInfo.systemUptime
         let delta = now - lastTick
@@ -92,21 +107,21 @@ final class GameSession {
         if active && !paused && !state.isWon && delta >= 0 && delta < 3 { archive.elapsed += delta }
         if now - lastSave >= 10 { lastSave = now; persist() }
     }
-    func setActive(_ value: Bool) { tick(); active = value; persist() }
-    func togglePause() { tick(); paused.toggle(); selection = nil; hintMove = nil; persist() }
+    func setActive(_ value: Bool) { tick(); active = value; startAudio(); persist() }
+    func togglePause() { tick(); paused.toggle(); selection = nil; hintMove = nil; startAudio(); persist() }
 
     func newGame(seed: UInt64? = nil) {
         do {
-            let preference = archive.autoCollect
+            let preference = settings.values.autoCollect
             archive = try GameArchive(seed: seed ?? UInt64.random(in: 1...UInt64.max))
             archive.autoCollect = preference
             clearInteraction(); paused = false; lastTick = ProcessInfo.processInfo.systemUptime
-            message = "新牌局已发好。"; persist()
+            message = "新牌局已发好。"; startAudio(); persist()
         } catch { report(error) }
     }
-    func restart() { archive.restart(); clearInteraction(); paused = false; message = "已恢复本局初始发牌。"; persist() }
-    func undo() { archive.undo(); clearInteraction(); message = "已撤销；计时继续累计。"; persist() }
-    func redo() { archive.redo(); clearInteraction(); message = state.isWon ? "恭喜，全部牌已归位！" : "已重做。"; persist() }
+    func restart() { archive.restart(); clearInteraction(); paused = false; message = "已恢复本局初始发牌。"; startAudio(); persist() }
+    func undo() { let previous = archive.cursor; archive.undo(); if archive.cursor != previous { playMoveSound() }; clearInteraction(); message = "已撤销；计时继续累计。"; persist() }
+    func redo() { let previous = archive.cursor; archive.redo(); if archive.cursor != previous { playMoveSound() }; clearInteraction(); message = state.isWon ? "恭喜，全部牌已归位！" : "已重做。"; persist() }
     private func clearInteraction() { selection = nil; hintMove = nil; animationRequest = nil; boardVersion += 1 }
 
     func source(for cardID: Int) -> (Location, Int)? {
@@ -143,10 +158,11 @@ final class GameSession {
             }
             guard let next = steps.last else { return false }
             let visualSteps = animated ? [state] + steps : steps
+            archive.autoCollect = settings.values.autoCollect
             archive.commit(next, move: move); clearInteraction()
             if visualSteps.count > 1 { animationRequest = BoardAnimationRequest(id: boardVersion, states: visualSteps) }
             message = state.isWon ? "恭喜，全部牌已归位！" : "已移至\(destination.name)。"
-            persist()
+            playMoveSound(); persist()
             return true
         } catch { report(error); return false }
     }
@@ -166,10 +182,11 @@ final class GameSession {
         guard !paused, !state.isWon else { return }
         let steps = Rules.safeCollectionSteps(from: state)
         guard let next = steps.last, next != state else { message = "目前没有可安全收取的牌。"; return }
+        archive.autoCollect = settings.values.autoCollect
         archive.commit(next, move: nil); clearInteraction()
         animationRequest = BoardAnimationRequest(id: boardVersion, states: steps)
         message = state.isWon ? "恭喜，全部牌已归位！" : "已收取安全牌，可一次撤销。"
-        persist()
+        playMoveSound(); persist()
     }
     func showHint() {
         guard !paused, !state.isWon else { return }

@@ -6,8 +6,8 @@
 <key>CFBundleIdentifier</key><string>local.fungleo.FreeCell</string>
 <key>CFBundleExecutable</key><string>FreeCell</string>
 <key>CFBundlePackageType</key><string>APPL</string>
-<key>CFBundleShortVersionString</key><string>1.3.2</string>
-<key>CFBundleVersion</key><string>6</string>
+<key>CFBundleShortVersionString</key><string>1.4.1</string>
+<key>CFBundleVersion</key><string>8</string>
 <key>LSMinimumSystemVersion</key><string>14.0</string>
 <key>NSHighResolutionCapable</key><true/>
 <key>CFBundleIconFile</key><string>FreeCell.icns</string>

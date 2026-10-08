@@ -11,6 +11,8 @@ struct GameBoard: NSViewRepresentable {
     let animationRequest: BoardAnimationRequest?
     let enabled: Bool
     let reduceMotion: Bool
+    let animationSpeed: AnimationSpeed
+    let automaticMoveGesture: AutomaticMoveGesture
     let onCardClick: (Card, Location) -> Void
     let onEmptyClick: (Location) -> Void
     let onDoubleClick: (Int) -> Bool
@@ -21,7 +23,7 @@ struct GameBoard: NSViewRepresentable {
     func updateNSView(_ view: BoardSurface, context: Context) {
         view.onCardClick = onCardClick; view.onEmptyClick = onEmptyClick
         view.onDoubleClick = onDoubleClick; view.onMove = onMove; view.onCancel = onCancel
-        view.update(state: state, selection: selection, hint: hint, version: version, animationRequest: animationRequest, enabled: enabled, reduceMotion: reduceMotion)
+        view.update(state: state, selection: selection, hint: hint, version: version, animationRequest: animationRequest, enabled: enabled, reduceMotion: reduceMotion, animationSpeed: animationSpeed, automaticMoveGesture: automaticMoveGesture)
     }
     static func dismantleNSView(_ view: BoardSurface, coordinator: ()) { view.cancelInteraction() }
 }
@@ -41,6 +43,8 @@ final class BoardSurface: NSView {
     private var version = 0
     private var enabled = true
     private var reduceMotion = false
+    private var animationSpeed: AnimationSpeed = .medium
+    private var automaticMoveGesture: AutomaticMoveGesture = .doubleClick
     private var press: Press?
     private var drag: Drag?
     private var clickTask: Task<Void, Never>?
@@ -89,14 +93,15 @@ final class BoardSurface: NSView {
     }
 
     func update(state: GameState, selection: Int?, hint: Move?, version: Int,
-                animationRequest: BoardAnimationRequest?, enabled: Bool, reduceMotion: Bool) {
+                animationRequest: BoardAnimationRequest?, enabled: Bool, reduceMotion: Bool, animationSpeed: AnimationSpeed, automaticMoveGesture: AutomaticMoveGesture) {
         let wonNow = state.isWon && self.state?.isWon != true
-        if self.version != version || !enabled { cancelInteraction() }
+        if self.version != version || !enabled || self.animationSpeed != animationSpeed || self.automaticMoveGesture != automaticMoveGesture { cancelInteraction() }
         let oldFocus = focusedIndex.flatMap { items.indices.contains($0) ? items[$0] : nil }
         let previousState = self.state
         let changed = self.state != state
         self.state = state; self.selection = selection; self.hint = hint
-        self.version = version; self.enabled = enabled; self.reduceMotion = reduceMotion
+        self.version = version; self.enabled = enabled; self.reduceMotion = reduceMotion || animationSpeed == .none
+        self.animationSpeed = animationSpeed; self.automaticMoveGesture = automaticMoveGesture
         if changed, let oldFocus {
             let current = items.first(where: { $0.key == oldFocus.key })
             if let current, case .tableau(let column) = current.location,
@@ -109,13 +114,13 @@ final class BoardSurface: NSView {
         }
         if let request = animationRequest, request.id != lastAnimationID {
             lastAnimationID = request.id
-            if enabled && !reduceMotion {
-                let sequence = BoardMotionSequence(states: request.states)
+            if enabled && !self.reduceMotion {
+                let sequence = BoardMotionSequence(states: request.states, speed: animationSpeed)
                 if !sequence.steps.isEmpty { startMotion(sequence, celebrate: wonNow) }
             }
         }
         if wonNow && motion == nil && enabled { startVictory() }
-        if reduceMotion { stopMotion(); stopVictory() }
+        if self.reduceMotion { stopMotion(); stopVictory() }
         needsDisplay = true
         refreshAccessibility()
     }
@@ -237,7 +242,7 @@ final class BoardSurface: NSView {
         var frame = originalFrame
         let shaking = feedbackCardID == card.id || feedbackContains(card)
         if shaking && !reduceMotion {
-            let progress = min(1, (ProcessInfo.processInfo.systemUptime - feedbackStart) / 0.36)
+            let progress = min(1, (ProcessInfo.processInfo.systemUptime - feedbackStart) / (0.36 * animationSpeed.durationMultiplier))
             frame.origin.x += sin(progress * .pi * 8) * (1 - progress) * 9
         }
         NSGraphicsContext.saveGraphicsState()
@@ -278,13 +283,25 @@ final class BoardSurface: NSView {
         }
         if let pending = pendingClick {
             clickTask?.cancel(); clickTask = nil; pendingClick = nil
-            if event.clickCount != 2 || pending.0.key != item.key {
+            if event.clickCount != 2 || automaticMoveGesture != .doubleClick || pending.0.key != item.key {
                 if pending.1 == version { activate(pending.0) }
             }
         }
         window?.makeFirstResponder(self)
         focusedIndex = items.firstIndex(where: { $0.key == item.key }) ?? 0
-        press = Press(item: item, point: point, doubleClick: event.clickCount == 2)
+        press = Press(item: item, point: point, doubleClick: event.clickCount == 2 && automaticMoveGesture == .doubleClick)
+        needsDisplay = true
+    }
+    override func rightMouseDown(with event: NSEvent) {
+        guard enabled, motion == nil, automaticMoveGesture == .rightClick else { return }
+        cancelInteraction()
+        let point = convert(event.locationInWindow, from: nil)
+        guard let item = items.reversed().first(where: { $0.frame.contains(point) }), let card = item.card else {
+            focusedIndex = nil; onCancel?(); return
+        }
+        window?.makeFirstResponder(self)
+        focusedIndex = items.firstIndex(where: { $0.key == item.key })
+        if onDoubleClick?(card.id) != true { shake(card.id) }
         needsDisplay = true
     }
     override func mouseDragged(with event: NSEvent) {
@@ -339,8 +356,9 @@ final class BoardSurface: NSView {
     private func shake(_ cardID: Int) {
         feedbackTask?.cancel()
         feedbackCardID = cardID; feedbackStart = ProcessInfo.processInfo.systemUptime
+        let pulses = max(1, Int(24 * animationSpeed.durationMultiplier))
         feedbackTask = Task { [weak self] in
-            for _ in 0..<24 {
+            for _ in 0..<pulses {
                 do { try await Task.sleep(for: .milliseconds(16)) } catch { return }
                 guard let self else { return }
                 self.needsDisplay = true
@@ -394,8 +412,9 @@ final class BoardSurface: NSView {
         guard !reduceMotion else { return }
         stopVictory()
         victoryStart = ProcessInfo.processInfo.systemUptime
+        let pulses = max(1, Int(210 * animationSpeed.durationMultiplier))
         victoryTask = Task { [weak self] in
-            for _ in 0..<210 {
+            for _ in 0..<pulses {
                 do { try await Task.sleep(for: .milliseconds(16)) } catch { return }
                 guard let self else { return }
                 self.needsDisplay = true
@@ -408,7 +427,7 @@ final class BoardSurface: NSView {
     }
     private func drawVictory() {
         guard let start = victoryStart, !reduceMotion else { return }
-        let elapsed = ProcessInfo.processInfo.systemUptime - start
+        let elapsed = (ProcessInfo.processInfo.systemUptime - start) / animationSpeed.durationMultiplier
         let colors: [NSColor] = [gold, .systemMint, .white, .systemOrange]
         for index in 0..<84 {
             let age = elapsed - Double(index) / 84 * 0.65

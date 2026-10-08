@@ -79,7 +79,9 @@ struct CheckRunner {
             ("暂存牌双击不互换空当", storedCardDoubleClickSkipsCells),
             ("收牌动画序列顺序与终点", collectionTimelineAndBoundaries),
             ("动画坐标及窗口边界", collectionFlightCoordinates),
-            ("整组动画保持牌龙间距", groupAnimationPreservesDragon)
+            ("整组动画保持牌龙间距", groupAnimationPreservesDragon),
+            ("设置默认值、编码恢复及兼容", preferencesDefaultsAndRoundTrip),
+            ("四档动画速度及关闭动画边界", animationSpeedTimelines)
         ]
         var failures = 0
         for (name, run) in checks {

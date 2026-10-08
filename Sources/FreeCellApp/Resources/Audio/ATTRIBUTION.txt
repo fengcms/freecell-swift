@@ -1,0 +1,14 @@
+BACKGROUND MUSIC
+"Dream Culture" by Kevin MacLeod (incompetech.com)
+Licensed under Creative Commons Attribution 4.0 International:
+https://creativecommons.org/licenses/by/4.0/
+Source: https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1300046
+Download: https://incompetech.com/music/royalty-free/mp3-royaltyfree/Dream%20Culture.mp3
+File is unchanged. Played at reduced volume and repeated during gameplay.
+
+MOVEMENT SOUND
+Interface Sounds (1.0), click_003.wav, by Kenney (www.kenney.nl)
+Licensed CC0: https://creativecommons.org/publicdomain/zero/1.0/
+Source: https://kenney.nl/assets/interface-sounds
+File is unchanged, played at reduced volume.
+See Kenney-LICENSE.txt for the original license notice.

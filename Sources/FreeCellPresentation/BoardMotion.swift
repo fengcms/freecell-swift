@@ -56,7 +56,7 @@ public struct BoardMotionSequence: Sendable {
     public let maximumColumnCount: Int
     public var duration: TimeInterval { stepDuration * Double(steps.count) }
 
-    public init(states: [GameState]) {
+    public init(states: [GameState], speed: AnimationSpeed = .medium) {
         maximumColumnCounts = (0..<8).map { index in states.map { $0.tableau[index].count }.max() ?? 0 }
         maximumColumnCount = states.flatMap { $0.tableau.map(\.count) }.max() ?? 7
         func positions(in state: GameState) -> [Int: BoardCardPosition] {
@@ -85,7 +85,7 @@ public struct BoardMotionSequence: Sendable {
             }
             return flights.isEmpty ? nil : BoardMotionStep(after: after, flights: flights)
         }
-        stepDuration = max(0.06, min(0.28, 2.8 / Double(max(1, steps.count))))
+        stepDuration = max(0.06, min(0.28, 2.8 / Double(max(1, steps.count)))) * speed.durationMultiplier
     }
     public func frame(at elapsed: TimeInterval) -> BoardMotionFrame? {
         guard elapsed.isFinite, elapsed >= 0, elapsed < duration else { return nil }
