@@ -1,0 +1,322 @@
+{
+  "source": "Full Deck Solitaire.app/Contents/Resources",
+  "copyright": "GRL Games Inc, 2011-2024",
+  "dimensions": [
+    264,
+    384
+  ],
+  "cards": [
+    {
+      "id": 1,
+      "suit": "clubs",
+      "rank": 1,
+      "file": "1.png"
+    },
+    {
+      "id": 2,
+      "suit": "clubs",
+      "rank": 2,
+      "file": "2.png"
+    },
+    {
+      "id": 3,
+      "suit": "clubs",
+      "rank": 3,
+      "file": "3.png"
+    },
+    {
+      "id": 4,
+      "suit": "clubs",
+      "rank": 4,
+      "file": "4.png"
+    },
+    {
+      "id": 5,
+      "suit": "clubs",
+      "rank": 5,
+      "file": "5.png"
+    },
+    {
+      "id": 6,
+      "suit": "clubs",
+      "rank": 6,
+      "file": "6.png"
+    },
+    {
+      "id": 7,
+      "suit": "clubs",
+      "rank": 7,
+      "file": "7.png"
+    },
+    {
+      "id": 8,
+      "suit": "clubs",
+      "rank": 8,
+      "file": "8.png"
+    },
+    {
+      "id": 9,
+      "suit": "clubs",
+      "rank": 9,
+      "file": "9.png"
+    },
+    {
+      "id": 10,
+      "suit": "clubs",
+      "rank": 10,
+      "file": "10.png"
+    },
+    {
+      "id": 11,
+      "suit": "clubs",
+      "rank": 11,
+      "file": "11.png"
+    },
+    {
+      "id": 12,
+      "suit": "clubs",
+      "rank": 12,
+      "file": "12.png"
+    },
+    {
+      "id": 13,
+      "suit": "clubs",
+      "rank": 13,
+      "file": "13.png"
+    },
+    {
+      "id": 14,
+      "suit": "diamonds",
+      "rank": 1,
+      "file": "14.png"
+    },
+    {
+      "id": 15,
+      "suit": "diamonds",
+      "rank": 2,
+      "file": "15.png"
+    },
+    {
+      "id": 16,
+      "suit": "diamonds",
+      "rank": 3,
+      "file": "16.png"
+    },
+    {
+      "id": 17,
+      "suit": "diamonds",
+      "rank": 4,
+      "file": "17.png"
+    },
+    {
+      "id": 18,
+      "suit": "diamonds",
+      "rank": 5,
+      "file": "18.png"
+    },
+    {
+      "id": 19,
+      "suit": "diamonds",
+      "rank": 6,
+      "file": "19.png"
+    },
+    {
+      "id": 20,
+      "suit": "diamonds",
+      "rank": 7,
+      "file": "20.png"
+    },
+    {
+      "id": 21,
+      "suit": "diamonds",
+      "rank": 8,
+      "file": "21.png"
+    },
+    {
+      "id": 22,
+      "suit": "diamonds",
+      "rank": 9,
+      "file": "22.png"
+    },
+    {
+      "id": 23,
+      "suit": "diamonds",
+      "rank": 10,
+      "file": "23.png"
+    },
+    {
+      "id": 24,
+      "suit": "diamonds",
+      "rank": 11,
+      "file": "24.png"
+    },
+    {
+      "id": 25,
+      "suit": "diamonds",
+      "rank": 12,
+      "file": "25.png"
+    },
+    {
+      "id": 26,
+      "suit": "diamonds",
+      "rank": 13,
+      "file": "26.png"
+    },
+    {
+      "id": 27,
+      "suit": "hearts",
+      "rank": 1,
+      "file": "27.png"
+    },
+    {
+      "id": 28,
+      "suit": "hearts",
+      "rank": 2,
+      "file": "28.png"
+    },
+    {
+      "id": 29,
+      "suit": "hearts",
+      "rank": 3,
+      "file": "29.png"
+    },
+    {
+      "id": 30,
+      "suit": "hearts",
+      "rank": 4,
+      "file": "30.png"
+    },
+    {
+      "id": 31,
+      "suit": "hearts",
+      "rank": 5,
+      "file": "31.png"
+    },
+    {
+      "id": 32,
+      "suit": "hearts",
+      "rank": 6,
+      "file": "32.png"
+    },
+    {
+      "id": 33,
+      "suit": "hearts",
+      "rank": 7,
+      "file": "33.png"
+    },
+    {
+      "id": 34,
+      "suit": "hearts",
+      "rank": 8,
+      "file": "34.png"
+    },
+    {
+      "id": 35,
+      "suit": "hearts",
+      "rank": 9,
+      "file": "35.png"
+    },
+    {
+      "id": 36,
+      "suit": "hearts",
+      "rank": 10,
+      "file": "36.png"
+    },
+    {
+      "id": 37,
+      "suit": "hearts",
+      "rank": 11,
+      "file": "37.png"
+    },
+    {
+      "id": 38,
+      "suit": "hearts",
+      "rank": 12,
+      "file": "38.png"
+    },
+    {
+      "id": 39,
+      "suit": "hearts",
+      "rank": 13,
+      "file": "39.png"
+    },
+    {
+      "id": 40,
+      "suit": "spades",
+      "rank": 1,
+      "file": "40.png"
+    },
+    {
+      "id": 41,
+      "suit": "spades",
+      "rank": 2,
+      "file": "41.png"
+    },
+    {
+      "id": 42,
+      "suit": "spades",
+      "rank": 3,
+      "file": "42.png"
+    },
+    {
+      "id": 43,
+      "suit": "spades",
+      "rank": 4,
+      "file": "43.png"
+    },
+    {
+      "id": 44,
+      "suit": "spades",
+      "rank": 5,
+      "file": "44.png"
+    },
+    {
+      "id": 45,
+      "suit": "spades",
+      "rank": 6,
+      "file": "45.png"
+    },
+    {
+      "id": 46,
+      "suit": "spades",
+      "rank": 7,
+      "file": "46.png"
+    },
+    {
+      "id": 47,
+      "suit": "spades",
+      "rank": 8,
+      "file": "47.png"
+    },
+    {
+      "id": 48,
+      "suit": "spades",
+      "rank": 9,
+      "file": "48.png"
+    },
+    {
+      "id": 49,
+      "suit": "spades",
+      "rank": 10,
+      "file": "49.png"
+    },
+    {
+      "id": 50,
+      "suit": "spades",
+      "rank": 11,
+      "file": "50.png"
+    },
+    {
+      "id": 51,
+      "suit": "spades",
+      "rank": 12,
+      "file": "51.png"
+    },
+    {
+      "id": 52,
+      "suit": "spades",
+      "rank": 13,
+      "file": "52.png"
+    }
+  ]
+}
