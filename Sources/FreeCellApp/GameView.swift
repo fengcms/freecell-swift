@@ -152,7 +152,7 @@ struct GameView: View {
             Text("按设置双击或右击，依次尝试：收牌、接到非空工作列、放入空当、放到空列；暂存牌不会换到另一空当。没有目标时晃动。拖动有序牌组时整组跟随鼠标。")
             Divider()
             Text("键盘：Tab / Shift-Tab 切换控件；牌桌内用方向键切换牌，空格选牌或确认目标，回车自动移动；⌘N 新局，⌘R 重开，⌘, 设置，⌘/ 规则，⌘Z 撤销，⇧⌘Z 重做，⇧⌘H 提示，⌘K 收牌，⌘P 暂停，⌃⌘F 切换原生全屏，Esc 取消选择。")
-            Text("本游戏采用自有牌局编号，不兼容 Microsoft 编号。切换到其他应用或暂停时停止计时。牌面来源：用户提供的 Full Deck Solitaire（GRL Games）。").font(.caption).foregroundStyle(.secondary)
+            Text("本游戏采用自有牌局编号，不兼容 Microsoft 编号。切换到其他应用或暂停时停止计时。牌面：Byron Knoll / Vector-Playing-Cards（公共领域）。").font(.caption).foregroundStyle(.secondary)
             HStack { Spacer(); Button("开始游戏") { showRules = false }.keyboardShortcut(.defaultAction) }
         }.padding(28).frame(width: 540)
     }

@@ -1,0 +1,18 @@
+PLAYING CARD ARTWORK
+Original artwork: Byron Knoll.
+Source: https://github.com/notpeter/Vector-Playing-Cards
+Pinned commit: 72cb5b288ed61251ef344e369446687cd51281a4
+License: Public Domain; optionally WTFPL where public domain is not recognized.
+The upstream license covers the images and transformed PNG output, including commercial redistribution.
+Upstream license statement (verbatim):
+These images, scripts and subsequent transformational output (e.g. custom sized PNGs) are released into the public domain or optionally licensed under the WTFPL in juristictions where the public domain is not a recognized legal concept. Either way, do as you see fit: relicense, embed in commercial, non-commercial or open-source software, etc.
+The original source images were released by Byron Knoll into the public domain on Google Code as vector-playing-cards.
+
+Changes by Fungleo: rasterized SVG artwork to 528 x 768 PNG; mapped C/D/H/S, A through K to game IDs 1 through 52. The original aspect ratio differs by less than 0.2% from the game's ratio.
+Full upstream README and the 52 original SVGs are preserved in App/CardSources in the source repository.
+
+Approved styling: warm ivory radial-gradient paper with a subtle amber wash; bold inset corner indices and redrawn corner suit symbols; central artwork scaled uniformly (A 90%, 2-10 88%, J/Q/K 82%, shifted upward for stacked head visibility). White illustration regions and embedded artwork backgrounds were tinted ivory. Original upstream SVGs are preserved; styled SVGs are in App/CardSources/Adjusted.
+
+Stacking revision: face artwork enlarged and raised; corner clubs redrawn as three rounded lobes with a stem; paper and white regions slightly darkened.
+
+Portrait revision: J/Q/K artwork now centered at 110% of upstream size; removed only the rounded portrait outline and redundant suit ornaments to keep corner indices clear. Internal illustration linework is preserved.

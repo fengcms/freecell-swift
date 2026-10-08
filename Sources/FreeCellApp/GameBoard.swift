@@ -249,7 +249,7 @@ final class BoardSurface: NSView {
         let path = NSBezierPath(roundedRect: frame, xRadius: layout.cornerRadius, yRadius: layout.cornerRadius)
         let shadow = NSShadow(); shadow.shadowColor = NSColor.black.withAlphaComponent(0.32)
         shadow.shadowBlurRadius = 4; shadow.shadowOffset = NSSize(width: 0, height: 2); shadow.set()
-        NSColor.white.setFill(); path.fill()
+        NSColor(calibratedRed: 238.0 / 255, green: 228.0 / 255, blue: 207.0 / 255, alpha: 1).setFill(); path.fill()
         NSGraphicsContext.restoreGraphicsState()
         NSGraphicsContext.saveGraphicsState()
         path.addClip()

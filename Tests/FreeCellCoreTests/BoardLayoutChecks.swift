@@ -57,6 +57,6 @@ func cardSizeStableAndColumnsCompressIndependently() throws {
         }
         let reserve = size.height - initial.padding - initial.columnFrame(0, cardCount: 7).maxY
         try expect(reserve >= initial.cardSize.width * 0.30 * 6 - 0.001)
-        try expect(abs(initial.cornerRadius / initial.cardSize.width - 16.0 / 264.0) < 0.0001)
+        try expect(abs(initial.cornerRadius / initial.cardSize.width - 6.87 / 167.0869141) < 0.0001)
     }
 }

@@ -34,7 +34,7 @@ public struct BoardLayout: Sendable {
         slotY = padding
         columnY = slotY + cardSize.height + width * 0.30
     }
-    public var cornerRadius: CGFloat { cardSize.width * 16 / 264 }
+    public var cornerRadius: CGFloat { cardSize.width * 6.87 / 167.0869141 }
     public func spacing(for column: Int) -> CGFloat {
         let count = columnCounts.indices.contains(column) ? columnCounts[column] : 1
         let available = max(0, size.height - padding - columnY - cardSize.height)

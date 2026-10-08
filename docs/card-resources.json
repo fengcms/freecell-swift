@@ -1,7 +1,14 @@
 {
-  "source": "Full Deck Solitaire.app/Contents/Resources",
-  "copyright": "GRL Games Inc, 2011-2024",
+  "source": "https://github.com/notpeter/Vector-Playing-Cards",
+  "sourceCommit": "72cb5b288ed61251ef344e369446687cd51281a4",
+  "author": "Byron Knoll; Vector-Playing-Cards contributors",
+  "license": "Public Domain; optional WTFPL in jurisdictions that do not recognize public domain",
+  "style": "Warm ivory radial gradients; bold inset indices; A artwork 90%, number artwork 88%, face artwork 110%, centered, without portrait outline",
   "dimensions": [
+    528,
+    768
+  ],
+  "displayAspectRatio": [
     264,
     384
   ],
@@ -10,313 +17,365 @@
       "id": 1,
       "suit": "clubs",
       "rank": 1,
-      "file": "1.png"
+      "file": "1.png",
+      "sourceFile": "AC.svg"
     },
     {
       "id": 2,
       "suit": "clubs",
       "rank": 2,
-      "file": "2.png"
+      "file": "2.png",
+      "sourceFile": "2C.svg"
     },
     {
       "id": 3,
       "suit": "clubs",
       "rank": 3,
-      "file": "3.png"
+      "file": "3.png",
+      "sourceFile": "3C.svg"
     },
     {
       "id": 4,
       "suit": "clubs",
       "rank": 4,
-      "file": "4.png"
+      "file": "4.png",
+      "sourceFile": "4C.svg"
     },
     {
       "id": 5,
       "suit": "clubs",
       "rank": 5,
-      "file": "5.png"
+      "file": "5.png",
+      "sourceFile": "5C.svg"
     },
     {
       "id": 6,
       "suit": "clubs",
       "rank": 6,
-      "file": "6.png"
+      "file": "6.png",
+      "sourceFile": "6C.svg"
     },
     {
       "id": 7,
       "suit": "clubs",
       "rank": 7,
-      "file": "7.png"
+      "file": "7.png",
+      "sourceFile": "7C.svg"
     },
     {
       "id": 8,
       "suit": "clubs",
       "rank": 8,
-      "file": "8.png"
+      "file": "8.png",
+      "sourceFile": "8C.svg"
     },
     {
       "id": 9,
       "suit": "clubs",
       "rank": 9,
-      "file": "9.png"
+      "file": "9.png",
+      "sourceFile": "9C.svg"
     },
     {
       "id": 10,
       "suit": "clubs",
       "rank": 10,
-      "file": "10.png"
+      "file": "10.png",
+      "sourceFile": "10C.svg"
     },
     {
       "id": 11,
       "suit": "clubs",
       "rank": 11,
-      "file": "11.png"
+      "file": "11.png",
+      "sourceFile": "JC.svg"
     },
     {
       "id": 12,
       "suit": "clubs",
       "rank": 12,
-      "file": "12.png"
+      "file": "12.png",
+      "sourceFile": "QC.svg"
     },
     {
       "id": 13,
       "suit": "clubs",
       "rank": 13,
-      "file": "13.png"
+      "file": "13.png",
+      "sourceFile": "KC.svg"
     },
     {
       "id": 14,
       "suit": "diamonds",
       "rank": 1,
-      "file": "14.png"
+      "file": "14.png",
+      "sourceFile": "AD.svg"
     },
     {
       "id": 15,
       "suit": "diamonds",
       "rank": 2,
-      "file": "15.png"
+      "file": "15.png",
+      "sourceFile": "2D.svg"
     },
     {
       "id": 16,
       "suit": "diamonds",
       "rank": 3,
-      "file": "16.png"
+      "file": "16.png",
+      "sourceFile": "3D.svg"
     },
     {
       "id": 17,
       "suit": "diamonds",
       "rank": 4,
-      "file": "17.png"
+      "file": "17.png",
+      "sourceFile": "4D.svg"
     },
     {
       "id": 18,
       "suit": "diamonds",
       "rank": 5,
-      "file": "18.png"
+      "file": "18.png",
+      "sourceFile": "5D.svg"
     },
     {
       "id": 19,
       "suit": "diamonds",
       "rank": 6,
-      "file": "19.png"
+      "file": "19.png",
+      "sourceFile": "6D.svg"
     },
     {
       "id": 20,
       "suit": "diamonds",
       "rank": 7,
-      "file": "20.png"
+      "file": "20.png",
+      "sourceFile": "7D.svg"
     },
     {
       "id": 21,
       "suit": "diamonds",
       "rank": 8,
-      "file": "21.png"
+      "file": "21.png",
+      "sourceFile": "8D.svg"
     },
     {
       "id": 22,
       "suit": "diamonds",
       "rank": 9,
-      "file": "22.png"
+      "file": "22.png",
+      "sourceFile": "9D.svg"
     },
     {
       "id": 23,
       "suit": "diamonds",
       "rank": 10,
-      "file": "23.png"
+      "file": "23.png",
+      "sourceFile": "10D.svg"
     },
     {
       "id": 24,
       "suit": "diamonds",
       "rank": 11,
-      "file": "24.png"
+      "file": "24.png",
+      "sourceFile": "JD.svg"
     },
     {
       "id": 25,
       "suit": "diamonds",
       "rank": 12,
-      "file": "25.png"
+      "file": "25.png",
+      "sourceFile": "QD.svg"
     },
     {
       "id": 26,
       "suit": "diamonds",
       "rank": 13,
-      "file": "26.png"
+      "file": "26.png",
+      "sourceFile": "KD.svg"
     },
     {
       "id": 27,
       "suit": "hearts",
       "rank": 1,
-      "file": "27.png"
+      "file": "27.png",
+      "sourceFile": "AH.svg"
     },
     {
       "id": 28,
       "suit": "hearts",
       "rank": 2,
-      "file": "28.png"
+      "file": "28.png",
+      "sourceFile": "2H.svg"
     },
     {
       "id": 29,
       "suit": "hearts",
       "rank": 3,
-      "file": "29.png"
+      "file": "29.png",
+      "sourceFile": "3H.svg"
     },
     {
       "id": 30,
       "suit": "hearts",
       "rank": 4,
-      "file": "30.png"
+      "file": "30.png",
+      "sourceFile": "4H.svg"
     },
     {
       "id": 31,
       "suit": "hearts",
       "rank": 5,
-      "file": "31.png"
+      "file": "31.png",
+      "sourceFile": "5H.svg"
     },
     {
       "id": 32,
       "suit": "hearts",
       "rank": 6,
-      "file": "32.png"
+      "file": "32.png",
+      "sourceFile": "6H.svg"
     },
     {
       "id": 33,
       "suit": "hearts",
       "rank": 7,
-      "file": "33.png"
+      "file": "33.png",
+      "sourceFile": "7H.svg"
     },
     {
       "id": 34,
       "suit": "hearts",
       "rank": 8,
-      "file": "34.png"
+      "file": "34.png",
+      "sourceFile": "8H.svg"
     },
     {
       "id": 35,
       "suit": "hearts",
       "rank": 9,
-      "file": "35.png"
+      "file": "35.png",
+      "sourceFile": "9H.svg"
     },
     {
       "id": 36,
       "suit": "hearts",
       "rank": 10,
-      "file": "36.png"
+      "file": "36.png",
+      "sourceFile": "10H.svg"
     },
     {
       "id": 37,
       "suit": "hearts",
       "rank": 11,
-      "file": "37.png"
+      "file": "37.png",
+      "sourceFile": "JH.svg"
     },
     {
       "id": 38,
       "suit": "hearts",
       "rank": 12,
-      "file": "38.png"
+      "file": "38.png",
+      "sourceFile": "QH.svg"
     },
     {
       "id": 39,
       "suit": "hearts",
       "rank": 13,
-      "file": "39.png"
+      "file": "39.png",
+      "sourceFile": "KH.svg"
     },
     {
       "id": 40,
       "suit": "spades",
       "rank": 1,
-      "file": "40.png"
+      "file": "40.png",
+      "sourceFile": "AS.svg"
     },
     {
       "id": 41,
       "suit": "spades",
       "rank": 2,
-      "file": "41.png"
+      "file": "41.png",
+      "sourceFile": "2S.svg"
     },
     {
       "id": 42,
       "suit": "spades",
       "rank": 3,
-      "file": "42.png"
+      "file": "42.png",
+      "sourceFile": "3S.svg"
     },
     {
       "id": 43,
       "suit": "spades",
       "rank": 4,
-      "file": "43.png"
+      "file": "43.png",
+      "sourceFile": "4S.svg"
     },
     {
       "id": 44,
       "suit": "spades",
       "rank": 5,
-      "file": "44.png"
+      "file": "44.png",
+      "sourceFile": "5S.svg"
     },
     {
       "id": 45,
       "suit": "spades",
       "rank": 6,
-      "file": "45.png"
+      "file": "45.png",
+      "sourceFile": "6S.svg"
     },
     {
       "id": 46,
       "suit": "spades",
       "rank": 7,
-      "file": "46.png"
+      "file": "46.png",
+      "sourceFile": "7S.svg"
     },
     {
       "id": 47,
       "suit": "spades",
       "rank": 8,
-      "file": "47.png"
+      "file": "47.png",
+      "sourceFile": "8S.svg"
     },
     {
       "id": 48,
       "suit": "spades",
       "rank": 9,
-      "file": "48.png"
+      "file": "48.png",
+      "sourceFile": "9S.svg"
     },
     {
       "id": 49,
       "suit": "spades",
       "rank": 10,
-      "file": "49.png"
+      "file": "49.png",
+      "sourceFile": "10S.svg"
     },
     {
       "id": 50,
       "suit": "spades",
       "rank": 11,
-      "file": "50.png"
+      "file": "50.png",
+      "sourceFile": "JS.svg"
     },
     {
       "id": 51,
       "suit": "spades",
       "rank": 12,
-      "file": "51.png"
+      "file": "51.png",
+      "sourceFile": "QS.svg"
     },
     {
       "id": 52,
       "suit": "spades",
       "rank": 13,
-      "file": "52.png"
+      "file": "52.png",
+      "sourceFile": "KS.svg"
     }
   ]
 }
