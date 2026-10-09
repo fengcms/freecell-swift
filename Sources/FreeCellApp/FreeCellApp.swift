@@ -19,8 +19,8 @@ struct FreeCellApp: App {
                 Button(L("关于空当接龙")) { AboutGame.show() }
             }
             CommandGroup(replacing: .undoRedo) {
-                Button(L("撤销")) { session.undo() }.keyboardShortcut("z").disabled(!session.canUndo || session.paused)
-                Button(L("重做")) { session.redo() }.keyboardShortcut("z", modifiers: [.command, .shift]).disabled(!session.canRedo || session.paused)
+                Button(L("撤销")) { session.undo() }.keyboardShortcut("z").disabled(!session.canUndo || session.paused || session.state.isWon)
+                Button(L("重做")) { session.redo() }.keyboardShortcut("z", modifiers: [.command, .shift]).disabled(!session.canRedo || session.paused || session.state.isWon)
             }
             CommandGroup(after: .windowSize) {
                 Button(L("切换全屏")) { NativeWindowActions.toggleFullScreen() }
@@ -32,8 +32,8 @@ struct FreeCellApp: App {
                 Button(L("规则")) { GameCommand.rules.send() }.keyboardShortcut("/")
                 Divider()
                 Button(L("提示")) { session.showHint() }.keyboardShortcut("h", modifiers: [.command, .shift]).disabled(session.paused)
-                Button(L("安全收牌")) { session.collect() }.keyboardShortcut("k").disabled(session.paused)
-                Button(session.paused ? L("继续") : L("暂停")) { session.togglePause() }.keyboardShortcut("p")
+                Button(L("安全收牌")) { session.collect() }.keyboardShortcut("k").disabled(session.paused || session.state.isWon)
+                Button(session.paused ? L("继续") : L("暂停")) { session.togglePause() }.keyboardShortcut("p").disabled(session.state.isWon)
                 Button(L("取消选择")) { session.cancelSelection() }.keyboardShortcut(.escape, modifiers: [])
                 Divider()
                 Button(L("打开存档目录")) { session.revealSaveFolder() }

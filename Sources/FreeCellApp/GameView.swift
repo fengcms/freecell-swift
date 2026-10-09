@@ -20,7 +20,7 @@ struct GameView: View {
             header
             Divider().overlay(gold.opacity(0.25))
             GameBoard(state: session.state, selection: session.selection, hint: session.hintMove,
-                      version: session.boardVersion, animationRequest: session.animationRequest, enabled: !session.paused && session.active, reduceMotion: reduceMotion || session.settings.values.animationSpeed == .none,
+                      version: session.boardVersion, animationRequest: session.animationRequest, enabled: !session.paused && session.active && !session.state.isWon, reduceMotion: reduceMotion || session.settings.values.animationSpeed == .none,
                       animationSpeed: session.settings.values.animationSpeed, automaticMoveGesture: session.settings.values.automaticMoveGesture,
                       onCardClick: { session.click(card: $0, at: $1) },
                       onEmptyClick: { session.clickEmpty($0) },
@@ -30,17 +30,13 @@ struct GameView: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .opacity(session.paused ? 0.12 : 1)
                 .accessibilityHidden(session.paused)
-                .overlay(alignment: .bottom) {
+                .overlay {
                     if session.state.isWon && !session.paused {
-                        HStack(spacing: 16) {
-                            Image(systemName: "sparkles").foregroundStyle(gold)
-                            Text(L("全部归位，恭喜过关！")).font(.headline).foregroundStyle(gold)
-                            Text(L("moves %@ %@", String(session.moves), session.elapsed)).foregroundStyle(.white)
-                            if let record = session.statisticsRecordNotice { Text(L(record)).font(.caption.bold()).foregroundStyle(gold) }
-                            Button(buttonTitle(L("再来一局"), shortcut: "⌘N")) { session.newGame() }.buttonStyle(.borderedProminent).tint(gold).foregroundStyle(.black)
-                        }.padding(18).background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
-                            .padding(.bottom, 20)
-                            .transition(animationsDisabled ? .opacity : .scale(scale: 0.9).combined(with: .opacity))
+                        VictoryCelebrationView(moves: session.moves, elapsed: session.elapsed,
+                                               record: session.statisticsRecordNotice,
+                                               animationsDisabled: animationsDisabled,
+                                               onPlayAgain: { session.newGame() })
+                        .transition(animationsDisabled ? .opacity : .scale(scale: 0.92).combined(with: .opacity))
                     }
                 }
                 .animation(animationsDisabled ? nil : .spring(duration: 0.45 * session.settings.values.animationSpeed.durationMultiplier), value: session.state.isWon)
@@ -119,11 +115,11 @@ struct GameView: View {
                     if session.state.isWon { session.newGame() } else { requestReset(.newGame) }
                 }
                 Button(buttonTitle(L("重开"), shortcut: "⌘R"), systemImage: "arrow.clockwise") { requestReset(.restart) }
-                Button(buttonTitle(L("撤销"), shortcut: "⌘Z"), systemImage: "arrow.uturn.backward") { session.undo() }.disabled(!session.canUndo || session.paused)
-                Button(buttonTitle(L("重做"), shortcut: "⇧⌘Z"), systemImage: "arrow.uturn.forward") { session.redo() }.disabled(!session.canRedo || session.paused)
+                Button(buttonTitle(L("撤销"), shortcut: "⌘Z"), systemImage: "arrow.uturn.backward") { session.undo() }.disabled(!session.canUndo || session.paused || session.state.isWon)
+                Button(buttonTitle(L("重做"), shortcut: "⇧⌘Z"), systemImage: "arrow.uturn.forward") { session.redo() }.disabled(!session.canRedo || session.paused || session.state.isWon)
                 Button(buttonTitle(L("提示"), shortcut: "⇧⌘H"), systemImage: "lightbulb") { session.showHint() }.disabled(session.paused || session.state.isWon)
                 Button(buttonTitle(L("收牌"), shortcut: "⌘K"), systemImage: "tray.and.arrow.down") { session.collect() }.disabled(session.paused || session.state.isWon)
-                Button(buttonTitle(session.paused ? L("继续") : L("暂停"), shortcut: "⌘P"), systemImage: session.paused ? "play" : "pause") { session.togglePause() }
+                Button(buttonTitle(session.paused ? L("继续") : L("暂停"), shortcut: "⌘P"), systemImage: session.paused ? "play" : "pause") { session.togglePause() }.disabled(session.state.isWon)
                 Button(buttonTitle(L("规则"), shortcut: "⌘/"), systemImage: "questionmark.circle") { showRules = true }
                 Button(buttonTitle(L("统计"), shortcut: "⇧⌘S"), systemImage: "chart.bar") { StatisticsWindowController.show(session: session) }
     }

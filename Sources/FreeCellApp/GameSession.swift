@@ -95,13 +95,8 @@ final class GameSession {
                 logger.error("Archive recovery failed")
             }
         }
-        if archive.statisticsID == nil, let id = statistics.excludedIdentity(seed: archive.seed, algorithm: archive.algorithmVersion) {
-            archive.assignStatisticsIdentity(id); archive.statisticsLegacy = true; archive.statisticsExcluded = true
-            persist()
-        }
         if let id = archive.statisticsID, archive.current.isWon { _ = statistics.settleWin(id: id, moves: archive.cursor, seconds: archive.elapsed) }
-        statisticsExcluded = archive.statisticsExcluded || archive.statisticsID.map(statistics.isExcluded) == true
-        if statisticsExcluded && !archive.statisticsExcluded { archive.statisticsExcluded = true; persist() }
+        statisticsExcluded = archive.statisticsExcluded
     }
 
     func connectSettings() {

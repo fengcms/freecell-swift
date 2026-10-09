@@ -538,6 +538,17 @@
     "ja": "もう一度遊ぶ",
     "ko": "한 판 더"
   },
+  "胜利后空格或右键开始新牌局": {
+    "zh-Hans": "胜利后按空格或右键开始新牌局",
+    "en": "After a win, press Space or right-click to play again.",
+    "zh-Hant": "勝利後按空白鍵或按右鍵開始新牌局",
+    "fr": "Après une victoire, appuyez sur Espace ou faites un clic droit pour rejouer.",
+    "de": "Nach einem Sieg mit der Leertaste oder per Rechtsklick erneut spielen.",
+    "es": "Tras ganar, pulsa Espacio o haz clic derecho para jugar de nuevo.",
+    "ar": "بعد الفوز، اضغط مفتاح المسافة أو انقر بزر الفأرة الأيمن للعب مجددًا.",
+    "ja": "勝利後、スペースキーまたは右クリックでもう一度遊べます。",
+    "ko": "승리 후 스페이스바 또는 마우스 오른쪽 버튼을 눌러 다시 플레이하세요."
+  },
   "牌局已暂停": {
     "zh-Hans": "牌局已暂停",
     "en": "Game Paused",

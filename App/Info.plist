@@ -6,8 +6,8 @@
 <key>CFBundleIdentifier</key><string>local.fungleo.FreeCell</string>
 <key>CFBundleExecutable</key><string>FreeCell</string>
 <key>CFBundlePackageType</key><string>APPL</string>
-<key>CFBundleShortVersionString</key><string>1.6.0</string>
-<key>CFBundleVersion</key><string>11</string>
+<key>CFBundleShortVersionString</key><string>1.6.1</string>
+<key>CFBundleVersion</key><string>12</string>
 <key>CFBundleDevelopmentRegion</key><string>en</string>
 <key>CFBundleLocalizations</key><array><string>en</string><string>zh-Hans</string><string>zh-Hant</string><string>fr</string><string>de</string><string>es</string><string>ar</string><string>ja</string><string>ko</string></array>
 <key>LSMinimumSystemVersion</key><string>14.0</string>

@@ -28,7 +28,7 @@ open build/FreeCell.app
 - 整组移动遵守空当及空列容量；空目标列不会被重复计作中转列。
 - 新局、同局重开、自有编号复现、撤销与重做。
 - 合法动作提示、手动安全收牌、可关闭的保守自动收牌。
-- 步数、有效游戏计时、暂停、胜利彩纸动画与自动存档恢复；胜利后直接开始新局。
+- 步数、有效游戏计时、暂停、胜利彩纸动画与自动存档恢复；胜利后锁定牌桌并显示居中的庆祝界面，可点击大按钮、按空格或右击直接开始新局。
 - 收牌与双击自动移动有牌面飞行过渡，批量收牌依次播放；动画不改变一次撤销的事务边界。
 - `Ctrl + Cmd + F` 进入／退出 macOS 原生全屏独立空间。
 - `⇧⌘S` 打开统计窗口：查看胜率、连胜、个人纪录、对局历史与同编号成绩，按周/月浏览趋势；支持本地 JSON 导入、合并、替换和重置。
@@ -125,15 +125,15 @@ docs/                         规则、设计、资源清单与验收记录
 
 已使用独立验证实例检查回车确认新局和重开、⌘C 取消新局、Esc 取消重开；取消后原牌局编号保留。关于窗口的文字和链接已完成界面检查，最终 Release 应用已打包并验证签名。
 
-### 发布准备（1.6.0）
+### 发布准备（1.6.1）
 
 源码使用 [MIT 许可证](LICENSE)，第三方素材按各自许可分发。作者：Fungleo；签名：键鼠请游戏人间 风流谈笑傲江湖；[个人博客](http://fungleo.com)。
 
-可通过 [GitHub Releases](https://github.com/fengcms/freecell-swift/releases) 分发独立应用，无需 Apple 开发者会员。[1.6.0 下载页](https://github.com/fengcms/freecell-swift/releases/tag/v1.6.0)提供 `FreeCell-1.6.0-macOS-AppleSilicon.dmg` 安装镜像、ZIP 备用包和 SHA-256 校验文件。打开 DMG 后将 FreeCell 拖入“应用程序”即可安装；GitHub 的 Source code 压缩包是源码，不能直接运行。
+可通过 [GitHub Releases](https://github.com/fengcms/freecell-swift/releases) 分发独立应用，无需 Apple 开发者会员。[1.6.1 下载页](https://github.com/fengcms/freecell-swift/releases/tag/v1.6.1)提供 `FreeCell-1.6.1-macOS-AppleSilicon.dmg` 安装镜像、ZIP 备用包和 SHA-256 校验文件。打开 DMG 后将 FreeCell 拖入“应用程序”即可安装；GitHub 的 Source code 压缩包是源码，不能直接运行。
 
 下载后解压，将 FreeCell.app 拖入“应用程序”后打开。应用使用临时签名，未经 Apple Developer ID 签名与公证；若首次打开被阻止，在确认下载自本仓库正式 Release 后，进入“系统设置 → 隐私与安全性”，点击“仍要打开”，按系统提示确认。详见 [Apple 首次打开说明](https://support.apple.com/guide/mac-help/open-a-mac-app-from-an-unknown-developer-mh40616/mac)。不需要关闭 Gatekeeper。
 
-发布前检查、安装说明和版本发布文案见 [GitHub 发布准备](docs/09-GitHub发布准备.md)。牌面采用已确认的浅暖渐变纸色、加粗留白角标；数字牌中央图案相对原版缩小12%，A及人物牌使用独立比例，J/Q/K居中放大并去掉人物外围黑框，以兼顾完整牌面和正常叠放时的头部可见性；角标梅花采用标准三瓣形。重新生成牌面仅开发时需要 Python 3、Node.js 与 sharp：`npm install --prefix /tmp/freecell-card-tools sharp`，然后依次运行 `SHARP_MODULE=/tmp/freecell-card-tools/node_modules/sharp python3 scripts/style-cards.py` 和 `SHARP_MODULE=/tmp/freecell-card-tools/node_modules/sharp node scripts/generate-cards.cjs`。正常构建和运行不依赖 Node.js。
+发布前检查、安装说明和版本发布文案见 [GitHub 发布准备](docs/09-GitHub发布准备.md)。胜利后的结束状态与快捷操作见[胜利界面说明](docs/15-胜利状态与庆祝界面.md)。牌面采用已确认的浅暖渐变纸色、加粗留白角标；数字牌中央图案相对原版缩小12%，A及人物牌使用独立比例，J/Q/K居中放大并去掉人物外围黑框，以兼顾完整牌面和正常叠放时的头部可见性；角标梅花采用标准三瓣形。重新生成牌面仅开发时需要 Python 3、Node.js 与 sharp：`npm install --prefix /tmp/freecell-card-tools sharp`，然后依次运行 `SHARP_MODULE=/tmp/freecell-card-tools/node_modules/sharp python3 scripts/style-cards.py` 和 `SHARP_MODULE=/tmp/freecell-card-tools/node_modules/sharp node scripts/generate-cards.cjs`。正常构建和运行不依赖 Node.js。
 
 ### 多语言（1.6.0）
 

@@ -1,10 +1,10 @@
-# FreeCell 1.6.0 GitHub 发布准备
+# FreeCell 1.6.1 GitHub 发布准备
 
 ## 发行方式
 
 通过 [GitHub Releases](https://docs.github.com/en/repositories/releasing-projects-on-github/about-releases) 上传可直接运行的 macOS 应用附件，不要求 Apple 开发者会员。GitHub 提供下载托管，不提供 Apple Developer ID 签名或公证。本项目暂用 ad-hoc 临时签名，因此首次下载打开可能需要用户在系统设置中允许。
 
-当前发布版本为 v1.6.0，附件包含 FreeCell-1.6.0-macOS-AppleSilicon.dmg、ZIP 备用包及 SHA256SUMS.txt。使用 scripts/package-release.sh 可重新构建、打包并生成校验值。
+当前发布版本为 v1.6.1，附件包含 FreeCell-1.6.1-macOS-AppleSilicon.dmg、ZIP 备用包及 SHA256SUMS.txt。使用 scripts/package-release.sh 可重新构建、打包并生成校验值。
 
 ## 支持范围与安装说明
 
@@ -20,15 +20,15 @@
 2. 在应用副本中测试实际下载、解压及首次启动，并在另一台 M 系列 Mac 验证独立运行、图标、全部资源、音频和存档。当前本机构建验收不能替代下载后的 Gatekeeper 验收。
 3. 确认最低 macOS 版本的实测支持范围。
 4. 已制作 arm64 应用 DMG 和 ZIP，保留临时签名、所有资源与第三方声明；校验文件包含两个安装包的 SHA-256。
-5. 已完成源码与文档提交、推送，并创建 `v1.6.0` 标签及 GitHub Release，上传应用附件与校验值。`.build` 和本机构建目录不纳入 Git。
+5. 已完成源码与文档提交、推送，并创建 `v1.6.1` 标签及 GitHub Release，上传应用附件与校验值。`.build` 和本机构建目录不纳入 Git。
 
 ## Release 文案草稿
 
-标题：FreeCell 1.6.0 · macOS 空当接龙
+标题：FreeCell 1.6.1 · macOS 空当接龙
 
-Fungleo 编写的原生 macOS 空当接龙。支持整组拖牌、自动移牌、安全收牌、撤销与重做、原生全屏、动画、背景音乐与设置。
+胜利后牌桌锁定，避免已完成牌局被右击等操作改写；新增居中庆祝界面和大号“再来一局”按钮，点击、按空格或右击均可直接开始下一局。其余功能包括整组拖牌、自动移牌、安全收牌、撤销与重做、原生全屏、动画、背景音乐、九种语言和本地统计。
 
-本版增加英语、简体中文、繁体中文、法语、德语、西班牙语、阿拉伯语、日语和韩语界面，可跟随系统语言或在设置中切换；并改进牌桌交互及存档保护。既有牌局存档继续兼容。
+界面支持英语、简体中文、繁体中文、法语、德语、西班牙语、阿拉伯语、日语和韩语，可跟随系统语言或在设置中切换。既有牌局存档继续兼容。
 
 仅支持 M 系列 Apple Silicon Mac，要求 macOS 14 及以上（macOS 14 尚未实机验证）。本应用使用临时签名，未经过 Apple Developer ID 签名与公证。首次打开若被阻止，请根据 README 的“隐私与安全性 → 仍要打开”步骤操作。
 
@@ -38,4 +38,4 @@ Fungleo 编写的原生 macOS 空当接龙。支持整组拖牌、自动移牌�
 源码：https://github.com/fengcms/freecell-swift  
 源码许可：MIT；第三方素材按 THIRD_PARTY_NOTICES.md 中的各自许可分发。
 
-附件：FreeCell-1.6.0-macOS-AppleSilicon.dmg（推荐）及 ZIP；SHA-256 见同版本的 SHA256SUMS.txt。下载页：https://github.com/fengcms/freecell-swift/releases/tag/v1.6.0 。本机验证环境为 macOS 26（实际具体版本见正式 Release 说明），未完成其他机器或 macOS 14 验收。
+附件：FreeCell-1.6.1-macOS-AppleSilicon.dmg（推荐）及 ZIP；SHA-256 见同版本的 SHA256SUMS.txt。下载页：https://github.com/fengcms/freecell-swift/releases/tag/v1.6.1 。本机验证环境为 macOS 26（实际具体版本见正式 Release 说明），未完成其他机器或 macOS 14 验收。
