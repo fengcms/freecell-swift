@@ -28,6 +28,7 @@ struct FreeCellApp: App {
             }
             CommandMenu(L("牌局")) {
                 Button(L("重新开始本局")) { GameCommand.restart.send() }.keyboardShortcut("r")
+                Button(L("统计")) { GameCommand.statistics.send() }.keyboardShortcut("s", modifiers: [.command, .shift])
                 Button(L("规则")) { GameCommand.rules.send() }.keyboardShortcut("/")
                 Divider()
                 Button(L("提示")) { session.showHint() }.keyboardShortcut("h", modifiers: [.command, .shift]).disabled(session.paused)
@@ -76,7 +77,7 @@ final class FreeCellDelegate: NSObject, NSApplicationDelegate {
 }
 
 // Menus and board buttons share the same confirmation and sheet paths.
-enum GameCommand { case newGame, restart, rules
+enum GameCommand { case newGame, restart, rules, statistics
     func send() { NotificationCenter.default.post(name: .freeCellCommand, object: self) }
 }
 extension Notification.Name { static let freeCellCommand = Notification.Name("FreeCell.command") }

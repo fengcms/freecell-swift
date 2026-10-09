@@ -12,6 +12,7 @@ struct GameLocaleModifier: ViewModifier {
     }
     private func refreshNativeUI() {
         AboutGame.refreshTitle()
+        StatisticsWindowController.refreshTitle()
         // SwiftUI rebuilds command menus after view updates.
         DispatchQueue.main.async {
             NativeMenuLocalization.refresh()

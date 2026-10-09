@@ -1,3 +1,9 @@
+/// User-facing tie-breaker for automatic moves to otherwise equivalent empty spaces.
+public enum AutomaticMovePriority: String, Codable, CaseIterable, Sendable {
+    case freeCellFirst
+    case emptyColumnFirst
+}
+
 public enum Rules {
     public static func canStack(_ card: Card, on target: Card) -> Bool {
         card.suit.isRed != target.suit.isRed && card.rank.rawValue + 1 == target.rank.rawValue
@@ -113,17 +119,22 @@ public enum Rules {
         return nil
     }
 
-    /// Double-click order: foundation, occupied columns, empty cells, then empty columns; ties go left to right.
+    /// Tries foundations, occupied columns, then empty spaces in the selected priority; ties go left to right.
     /// Cards already in a cell skip other cells.
-    public static func automaticMove(for cardID: Int, in state: GameState) -> Move? {
+    public static func automaticMove(
+        for cardID: Int,
+        in state: GameState,
+        priority: AutomaticMovePriority = .freeCellFirst
+    ) -> Move? {
         guard let selection = selection(for: cardID, in: state) else { return nil }
         let emptyCells: [Location]
         if case .cell = selection.source { emptyCells = [] }
         else { emptyCells = state.cells.indices.filter { state.cells[$0] == nil }.map(Location.cell) }
+        let emptyColumns = state.tableau.indices.filter { state.tableau[$0].isEmpty }.map(Location.tableau)
+        let emptyDestinations = priority == .emptyColumnFirst ? emptyColumns + emptyCells : emptyCells + emptyColumns
         let candidates = Suit.allCases.map(Location.foundation)
             + state.tableau.indices.filter { !state.tableau[$0].isEmpty }.map(Location.tableau)
-            + emptyCells
-            + state.tableau.indices.filter { state.tableau[$0].isEmpty }.map(Location.tableau)
+            + emptyDestinations
         for destination in candidates {
             let move = Move(from: selection.source, to: destination, count: selection.cards.count)
             if (try? validate(move, in: state)) != nil { return move }

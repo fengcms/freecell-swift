@@ -1,4 +1,5 @@
 import Foundation
+import FreeCellCore
 
 public enum AutomaticMoveGesture: String, Codable, CaseIterable, Sendable {
     case doubleClick, rightClick
@@ -17,19 +18,21 @@ public struct GamePreferences: Codable, Equatable, Sendable {
     public var language: GameLanguage = .system
     public var autoCollect = true
     public var automaticMoveGesture: AutomaticMoveGesture = .doubleClick
+    public var automaticMovePriority: AutomaticMovePriority = .freeCellFirst
     public var animationSpeed: AnimationSpeed = .medium
     public var backgroundMusic = true
     public var moveSound = true
     public var showShortcuts = false
     public init() {}
     private enum CodingKeys: String, CodingKey {
-        case language, autoCollect, automaticMoveGesture, animationSpeed, backgroundMusic, moveSound, showShortcuts
+        case language, autoCollect, automaticMoveGesture, automaticMovePriority, animationSpeed, backgroundMusic, moveSound, showShortcuts
     }
     public init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         language = (try? values.decodeIfPresent(GameLanguage.self, forKey: .language)) ?? .system
         autoCollect = try values.decodeIfPresent(Bool.self, forKey: .autoCollect) ?? true
         automaticMoveGesture = try values.decodeIfPresent(AutomaticMoveGesture.self, forKey: .automaticMoveGesture) ?? .doubleClick
+        automaticMovePriority = try values.decodeIfPresent(AutomaticMovePriority.self, forKey: .automaticMovePriority) ?? .freeCellFirst
         animationSpeed = try values.decodeIfPresent(AnimationSpeed.self, forKey: .animationSpeed) ?? .medium
         backgroundMusic = try values.decodeIfPresent(Bool.self, forKey: .backgroundMusic) ?? true
         moveSound = try values.decodeIfPresent(Bool.self, forKey: .moveSound) ?? true

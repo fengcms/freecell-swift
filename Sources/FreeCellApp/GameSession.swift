@@ -18,10 +18,12 @@ private actor SaveWriter {
 @MainActor @Observable
 final class GameSession {
     let settings: AppSettings
+    let statistics = StatisticsStore()
     private let audio = GameAudio()
     private(set) var archive: GameArchive
     private(set) var boardVersion = 0
     private(set) var animationRequest: BoardAnimationRequest?
+    private(set) var statisticsRecordNotice: String?
     var selection: Int?
     var hintMove: Move?
     var message = "选择一张牌，再点击目标；也可以直接拖动。"
@@ -35,6 +37,11 @@ final class GameSession {
     private var revision = 0
     private var lastTick = ProcessInfo.processInfo.systemUptime
     private var lastSave = ProcessInfo.processInfo.systemUptime
+    private var statisticsPendingByDay: [String: TimeInterval] = [:]
+    private var statisticsExcluded = false
+    private var pendingPreStartHints = 0
+    private var pendingPreStartRestart = false
+    private var pendingNoAssistReason: String?
     private let logger = Logger(subsystem: "local.fungleo.FreeCell", category: "Session")
 
     var state: GameState { archive.current }
@@ -88,6 +95,13 @@ final class GameSession {
                 logger.error("Archive recovery failed")
             }
         }
+        if archive.statisticsID == nil, let id = statistics.excludedIdentity(seed: archive.seed, algorithm: archive.algorithmVersion) {
+            archive.assignStatisticsIdentity(id); archive.statisticsLegacy = true; archive.statisticsExcluded = true
+            persist()
+        }
+        if let id = archive.statisticsID, archive.current.isWon { _ = statistics.settleWin(id: id, moves: archive.cursor, seconds: archive.elapsed) }
+        statisticsExcluded = archive.statisticsExcluded || archive.statisticsID.map(statistics.isExcluded) == true
+        if statisticsExcluded && !archive.statisticsExcluded { archive.statisticsExcluded = true; persist() }
     }
 
     func connectSettings() {
@@ -96,6 +110,10 @@ final class GameSession {
     }
     func applySettings() {
         let archivePreferenceChanged = archive.autoCollect != settings.values.autoCollect
+        if !archive.autoCollect, settings.values.autoCollect, let id = archive.statisticsID,
+           statistics.database.games.contains(where: { $0.id == id && $0.outcome == .inProgress }) {
+            statistics.action(.autoCollect, id: id, moves: archive.cursor, seconds: archive.elapsed)
+        }
         archive.autoCollect = settings.values.autoCollect
         audio.update(preferences: settings.values, active: active, paused: paused)
         if archivePreferenceChanged { persist() }
@@ -108,24 +126,75 @@ final class GameSession {
         let delta = now - lastTick
         lastTick = now
         // Exclude sleep or scheduling gaps rather than count hours spent away from the game.
-        if active && !paused && !state.isWon && delta >= 0 && delta < 3 { archive.elapsed += delta }
-        if now - lastSave >= 10 { lastSave = now; persist() }
+        if active && !paused && !state.isWon && delta >= 0 && delta < 3 {
+            archive.elapsed += delta
+            let registered = archive.statisticsID.map { id in statistics.database.games.contains(where: { $0.id == id && $0.outcome == .inProgress }) } ?? false
+            if !statisticsExcluded && (registered || archive.statisticsID == nil) {
+                let zone = TimeZone.current.identifier
+                let day = StatisticsDatabase.day(Date(), timeZone: TimeZone.current)
+                statisticsPendingByDay[day + "|" + zone, default: 0] += delta
+            }
+        }
+        if now - lastSave >= 10 {
+            lastSave = now; flushStatisticsTime(); statistics.persistSnapshot(); persist()
+        }
     }
-    func setActive(_ value: Bool) { tick(); active = value; startAudio(); persist() }
-    func togglePause() { tick(); paused.toggle(); selection = nil; hintMove = nil; startAudio(); persist() }
+    func setActive(_ value: Bool) { tick(); if !value { flushStatisticsTime(); statistics.persistSnapshot() }; active = value; startAudio(); persist() }
+    func togglePause() { tick(); paused.toggle(); if paused { flushStatisticsTime(); statistics.persistSnapshot() }; selection = nil; hintMove = nil; startAudio(); persist() }
 
     func newGame(seed: UInt64? = nil) {
         do {
+            if !state.isWon && archive.statisticsID == nil && (archive.cursor > 0 || !archive.history.isEmpty) { beginStatisticsIfNeeded() }
+            flushStatisticsTime()
+            if let id = archive.statisticsID { statistics.abandon(id: id) }
             let preference = settings.values.autoCollect
             archive = try GameArchive(seed: seed ?? UInt64.random(in: 1...UInt64.max))
+            statisticsPendingByDay.removeAll()
+            statisticsExcluded = false
+            statisticsRecordNotice = nil
             archive.autoCollect = preference
             clearInteraction(); paused = false; lastTick = ProcessInfo.processInfo.systemUptime
+            pendingPreStartHints = 0; pendingPreStartRestart = false; pendingNoAssistReason = nil
             message = "新牌局已发好。"; startAudio(); persist()
         } catch { report(error) }
     }
-    func restart() { archive.restart(); clearInteraction(); paused = false; message = "已恢复本局初始发牌。"; startAudio(); persist() }
-    func undo() { let previous = archive.cursor; archive.undo(); if archive.cursor != previous { playMoveSound() }; clearInteraction(); message = "已撤销；计时继续累计。"; persist() }
-    func redo() { let previous = archive.cursor; archive.redo(); if archive.cursor != previous { playMoveSound() }; clearInteraction(); message = state.isWon ? "恭喜，全部牌已归位！" : "已重做。"; persist() }
+    func restart() {
+        flushStatisticsTime()
+        var restartAlreadyRecorded = false
+        if !statisticsExcluded && archive.statisticsID == nil && (archive.cursor > 0 || !archive.history.isEmpty) {
+            let id = UUID(); let baselineMoves = archive.cursor; let baselineSeconds = archive.elapsed
+            archive.assignStatisticsIdentity(id); archive.statisticsLegacy = true
+            statistics.registerStart(id: id, seed: archive.seed, algorithm: archive.algorithmVersion,
+                                     baselineMoves: baselineMoves, baselineSeconds: baselineSeconds,
+                                     legacy: true, autoCollect: archive.autoCollect)
+            flushStatisticsTime()
+            statistics.restart(id: id, moves: baselineMoves, seconds: baselineSeconds)
+            restartAlreadyRecorded = true
+        }
+        if state.isWon || statisticsExcluded { archive.restart(); archive.startNewStatisticsIdentity(); archive.statisticsExcluded = false; archive.statisticsLegacy = false; statisticsExcluded = false; pendingPreStartHints = 0; pendingPreStartRestart = false; pendingNoAssistReason = "restart" }
+        else if let id = archive.statisticsID, statistics.database.games.contains(where: { $0.id == id && $0.outcome == .inProgress }) {
+            if !restartAlreadyRecorded { statistics.restart(id: id, moves: archive.cursor, seconds: archive.elapsed) }
+        } else {
+            pendingPreStartRestart = true
+            if archive.statisticsID == nil { archive.startNewStatisticsIdentity(); archive.statisticsLegacy = true }
+        }
+        archive.restart(); clearInteraction(); paused = false; message = "已恢复本局初始发牌。"; startAudio(); persist()
+        statisticsRecordNotice = nil
+    }
+    func undo() {
+        let previous = archive.cursor
+        if previous > 0 { beginStatisticsIfNeeded() }
+        archive.undo()
+        if archive.cursor != previous { recordStatistics(.undo); playMoveSound() }
+        clearInteraction(); message = "已撤销；计时继续累计。"; persist()
+    }
+    func redo() {
+        let previous = archive.cursor
+        if canRedo { beginStatisticsIfNeeded() }
+        archive.redo()
+        if archive.cursor != previous { recordStatistics(.redo); playMoveSound() }
+        clearInteraction(); message = state.isWon ? "恭喜，全部牌已归位！" : "已重做。"; settleStatisticsIfWon(); persist()
+    }
     private func clearInteraction() { selection = nil; hintMove = nil; animationRequest = nil; boardVersion += 1 }
 
     func source(for cardID: Int) -> (Location, Int)? {
@@ -148,11 +217,12 @@ final class GameSession {
         move(cardID: selected, to: location, animated: true)
     }
     @discardableResult
-    func move(cardID: Int, to destination: Location, animated: Bool = false) -> Bool {
+    func move(cardID: Int, to destination: Location, animated: Bool = false, automatic: Bool = false) -> Bool {
         guard !paused, let (source, count) = source(for: cardID) else { return false }
         let move = Move(from: source, to: destination, count: count)
         do {
             let moved = try Rules.applying(move, to: state)
+            beginStatisticsIfNeeded()
             var steps = [moved]
             if autoCollect {
                 switch source {
@@ -165,6 +235,13 @@ final class GameSession {
             archive.autoCollect = settings.values.autoCollect
             archive.commit(next, move: move); clearInteraction()
             if visualSteps.count > 1 { animationRequest = BoardAnimationRequest(id: boardVersion, states: visualSteps) }
+            let event: StatisticsEventKind
+            if automatic { event = .automaticMove }
+            else if case .foundation = source { event = .foundationTakeback }
+            else { event = .move }
+            recordStatistics(event, autoCollect: steps.count > 1)
+            if steps.count > 1 { recordStatistics(.autoCollect) }
+            settleStatisticsIfWon()
             message = state.isWon ? "恭喜，全部牌已归位！" : "已移至\(destination.name)。"
             playMoveSound(); persist()
             return true
@@ -174,20 +251,23 @@ final class GameSession {
     @discardableResult
     func doubleClick(cardID: Int) -> Bool {
         guard !paused else { return false }
-        guard let move = Rules.automaticMove(for: cardID, in: state) else {
+        guard let move = Rules.automaticMove(for: cardID, in: state, priority: settings.values.automaticMovePriority) else {
             selection = cardID; hintMove = nil
             message = "这张牌目前没有可用目标。"
             return false
         }
-        return self.move(cardID: cardID, to: move.destination, animated: true)
+        return self.move(cardID: cardID, to: move.destination, animated: true, automatic: true)
     }
 
     func collect() {
         guard !paused, !state.isWon else { return }
         let steps = Rules.safeCollectionSteps(from: state)
         guard let next = steps.last, next != state else { message = "目前没有可安全收取的牌。"; return }
+        beginStatisticsIfNeeded()
         archive.autoCollect = settings.values.autoCollect
         archive.commit(next, move: nil); clearInteraction()
+        recordStatistics(.collect)
+        settleStatisticsIfWon()
         animationRequest = BoardAnimationRequest(id: boardVersion, states: steps)
         message = state.isWon ? "恭喜，全部牌已归位！" : "已收取安全牌，可一次撤销。"
         playMoveSound(); persist()
@@ -197,6 +277,9 @@ final class GameSession {
         let candidate = Rules.hint(in: state, avoiding: hintMove)
         hintMove = candidate
         if let move = candidate {
+            if !statisticsExcluded, let id = archive.statisticsID,
+               statistics.database.games.contains(where: { $0.id == id && $0.outcome == .inProgress }) { recordStatistics(.hint) }
+            else if !state.isWon { pendingPreStartHints += 1 }
             let card: Card?
             if case .tableau(let index) = move.source { card = state.tableau[index].suffix(move.count).first }
             else { card = state.topCard(at: move.source) }
@@ -209,9 +292,14 @@ final class GameSession {
     }
     func cancelSelection() { clearInteraction(); message = "已取消选择。" }
     func revealSaveFolder() { NSWorkspace.shared.open(saveURL.deletingLastPathComponent()) }
+    func excludeCurrentGameFromStatistics(identity: UUID) {
+        archive.assignStatisticsIdentity(identity); statisticsExcluded = true; archive.statisticsExcluded = true
+        statisticsPendingByDay.removeAll(); persist()
+    }
     private func report(_ error: Error) { message = (error as? GameError)?.message ?? "操作失败，请重试。" }
     func saveBeforeQuit() async -> Bool {
         tick()
+        flushStatisticsTime(); statistics.persistSnapshot()
         guard !archiveWritesBlocked else { return false }
         do {
             let data = try JSONEncoder().encode(archive)
@@ -222,6 +310,61 @@ final class GameSession {
             saveError = "保存失败，请检查存档目录权限。"
             logger.error("Final archive write failed")
             return false
+        }
+    }
+
+    private func beginStatisticsIfNeeded() {
+        guard !statisticsExcluded else { return }
+        if archive.statisticsID == nil {
+            let legacyID = UUID(); let baselineMoves = archive.cursor; let baselineSeconds = archive.elapsed
+            archive.assignStatisticsIdentity(legacyID)
+            archive.statisticsLegacy = true
+            statistics.registerStart(id: legacyID, seed: archive.seed, algorithm: archive.algorithmVersion,
+                                     baselineMoves: baselineMoves, baselineSeconds: baselineSeconds, legacy: true,
+                                     autoCollect: archive.autoCollect)
+            for _ in 0..<pendingPreStartHints { statistics.action(.hint, id: legacyID, moves: baselineMoves, seconds: baselineSeconds) }
+            if pendingPreStartRestart { statistics.action(.restart, id: legacyID, moves: baselineMoves, seconds: baselineSeconds) }
+            if let reason = pendingNoAssistReason { statistics.disqualifyBeforeStart(id: legacyID, reason: reason) }
+            pendingPreStartHints = 0; pendingPreStartRestart = false
+            pendingNoAssistReason = nil
+            flushStatisticsTime()
+            persist()
+        } else if let id = archive.statisticsID, !statistics.database.games.contains(where: { $0.id == id }) {
+            statistics.registerStart(id: id, seed: archive.seed, algorithm: archive.algorithmVersion,
+                                     baselineMoves: archive.statisticsLegacy ? archive.cursor : 0,
+                                     baselineSeconds: archive.statisticsLegacy ? archive.elapsed : 0,
+                                     legacy: archive.statisticsLegacy, autoCollect: archive.autoCollect)
+            for _ in 0..<pendingPreStartHints { statistics.action(.hint, id: id, moves: 0, seconds: 0) }
+            if pendingPreStartRestart { statistics.action(.restart, id: id, moves: 0, seconds: 0) }
+            if let reason = pendingNoAssistReason { statistics.disqualifyBeforeStart(id: id, reason: reason) }
+            pendingPreStartHints = 0; pendingPreStartRestart = false
+            pendingNoAssistReason = nil
+            flushStatisticsTime()
+        }
+    }
+    private func recordStatistics(_ kind: StatisticsEventKind, autoCollect: Bool = false) {
+        guard !statisticsExcluded, let id = archive.statisticsID else { return }
+        statistics.action(kind, id: id, moves: archive.cursor, seconds: archive.elapsed, autoCollect: autoCollect)
+    }
+    private func settleStatisticsIfWon() {
+        guard state.isWon, !statisticsExcluded, let id = archive.statisticsID else { return }
+        flushStatisticsTime()
+        let previous = statistics.summary
+        guard statistics.settleWin(id: id, moves: archive.cursor, seconds: archive.elapsed) else { return }
+        let current = statistics.summary
+        if previous.bestMoves == nil || archive.cursor < (previous.bestMoves?.moves ?? .max) { statisticsRecordNotice = "新的最少步数纪录" }
+        else if previous.fastest == nil || archive.elapsed < (previous.fastest?.seconds ?? .infinity) { statisticsRecordNotice = "新的最快用时纪录" }
+        else if current.noAssistWins > previous.noAssistWins { statisticsRecordNotice = "无辅助胜局" }
+    }
+    private func flushStatisticsTime() {
+        guard !statisticsExcluded else { statisticsPendingByDay.removeAll(); return }
+        guard let id = archive.statisticsID else { return }
+        guard !statisticsPendingByDay.isEmpty else { return }
+        let pending = statisticsPendingByDay; statisticsPendingByDay.removeAll()
+        for (key, seconds) in pending {
+            let parts = key.split(separator: "|", maxSplits: 1).map(String.init)
+            guard parts.count == 2 else { continue }
+            statistics.addTime(id: id, seconds: seconds, attemptSeconds: archive.elapsed, localDay: parts[0], timeZone: parts[1])
         }
     }
 

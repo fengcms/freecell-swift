@@ -6,3 +6,5 @@ DerivedData/
 *.xcuserstate
 xcuserdata/
 Full\ Deck\ Solitaire.app/
+.github/
+.vscode/

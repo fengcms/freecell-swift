@@ -36,6 +36,7 @@ struct GameView: View {
                             Image(systemName: "sparkles").foregroundStyle(gold)
                             Text(L("全部归位，恭喜过关！")).font(.headline).foregroundStyle(gold)
                             Text(L("moves %@ %@", String(session.moves), session.elapsed)).foregroundStyle(.white)
+                            if let record = session.statisticsRecordNotice { Text(L(record)).font(.caption.bold()).foregroundStyle(gold) }
                             Button(buttonTitle(L("再来一局"), shortcut: "⌘N")) { session.newGame() }.buttonStyle(.borderedProminent).tint(gold).foregroundStyle(.black)
                         }.padding(18).background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 16))
                             .padding(.bottom, 20)
@@ -66,6 +67,7 @@ struct GameView: View {
             case .newGame: if session.state.isWon { session.newGame() } else { requestReset(.newGame) }
             case .restart: requestReset(.restart)
             case .rules: showRules = true
+            case .statistics: StatisticsWindowController.show(session: session)
             case nil: break
             }
         }
@@ -123,6 +125,7 @@ struct GameView: View {
                 Button(buttonTitle(L("收牌"), shortcut: "⌘K"), systemImage: "tray.and.arrow.down") { session.collect() }.disabled(session.paused || session.state.isWon)
                 Button(buttonTitle(session.paused ? L("继续") : L("暂停"), shortcut: "⌘P"), systemImage: session.paused ? "play" : "pause") { session.togglePause() }
                 Button(buttonTitle(L("规则"), shortcut: "⌘/"), systemImage: "questionmark.circle") { showRules = true }
+                Button(buttonTitle(L("统计"), shortcut: "⇧⌘S"), systemImage: "chart.bar") { StatisticsWindowController.show(session: session) }
     }
     private func metric(_ title: String, _ value: String) -> some View {
         VStack(alignment: .trailing, spacing: 4) {
@@ -133,6 +136,7 @@ struct GameView: View {
     private var preferencesSummary: String {
         let preferences = session.settings.values
         return [L(preferences.autoCollect ? "自动收" : "手动收"), localized(preferences.automaticMoveGesture.title),
+                L(preferences.automaticMovePriority == .freeCellFirst ? "优先空当" : "优先空列"),
                 L("动画") + ": " + localized(preferences.animationSpeed.title),
                 L("音乐") + ": " + L(preferences.backgroundMusic ? "开" : "关"),
                 L("音效") + ": " + L(preferences.moveSound ? "开" : "关"),

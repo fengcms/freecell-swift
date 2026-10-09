@@ -1,5 +1,6 @@
 import SwiftUI
 import FreeCellPresentation
+import FreeCellCore
 
 struct SettingsView: View {
     @Bindable var settings: AppSettings
@@ -13,7 +14,11 @@ struct SettingsView: View {
                 Picker(L("自动移牌"), selection: $settings.values.automaticMoveGesture) {
                     ForEach(AutomaticMoveGesture.allCases, id: \.self) { Text(localized($0.title)).tag($0) }
                 }.pickerStyle(.segmented)
-                Text(L("按所选方式依次尝试收牌、接到其他列、暂存或空列。回车始终可自动移牌。"))
+                Picker(L("空位优先级"), selection: $settings.values.automaticMovePriority) {
+                    Text(L("优先空当")).tag(AutomaticMovePriority.freeCellFirst)
+                    Text(L("优先空列")).tag(AutomaticMovePriority.emptyColumnFirst)
+                }.pickerStyle(.segmented)
+                Text(L("自动移牌先尝试收牌和可接牌列，再按此偏好选择空位。回车始终可自动移牌。"))
                     .font(.caption).foregroundStyle(.secondary)
             }
             Section(L("动画与声音")) {
