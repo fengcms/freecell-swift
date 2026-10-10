@@ -32,10 +32,14 @@
 
 仅支持 M 系列 Apple Silicon Mac，要求 macOS 14 及以上（macOS 14 尚未实机验证）。本应用使用临时签名，未经过 Apple Developer ID 签名与公证。首次打开若被阻止，请根据 README 的“隐私与安全性 → 仍要打开”步骤操作。
 
-作者：Fungleo  
-键鼠请游戏人间 风流谈笑傲江湖  
-博客：http://fungleo.com  
-源码：https://github.com/fengcms/freecell-swift  
+作者：Fungleo
+
+键鼠轻游戏人间 风流谈笑傲江湖
+
+博客：http://fungleo.com
+
+源码：https://github.com/fengcms/freecell-swift
+
 源码许可：MIT；第三方素材按 THIRD_PARTY_NOTICES.md 中的各自许可分发。
 
 附件：FreeCell-1.6.1-macOS-AppleSilicon.dmg（推荐）及 ZIP；SHA-256 见同版本的 SHA256SUMS.txt。下载页：https://github.com/fengcms/freecell-swift/releases/tag/v1.6.1 。本机验证环境为 macOS 26（实际具体版本见正式 Release 说明），未完成其他机器或 macOS 14 验收。

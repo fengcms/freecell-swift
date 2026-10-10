@@ -121,13 +121,13 @@ docs/                         规则、设计、资源清单与验收记录
 
 新局和重开的确认框支持回车确认、Esc 或 ⌘C 取消。⌘C 仅在该确认框打开时作为取消操作，不改变其他窗口的复制快捷键。胜利后新局仍直接开始。
 
-应用菜单“关于空当接龙”打开独立窗口，完整显示游戏简介、版本、作者 Fungleo、个人签名“键鼠请游戏人间 风流谈笑傲江湖”，以及 GitHub 仓库和个人博客的可点击链接。
+应用菜单“关于空当接龙”打开独立窗口，完整显示游戏简介、版本、作者 Fungleo、个人签名“键鼠轻游戏人间 风流谈笑傲江湖”，以及 GitHub 仓库和个人博客的可点击链接。
 
 已使用独立验证实例检查回车确认新局和重开、⌘C 取消新局、Esc 取消重开；取消后原牌局编号保留。关于窗口的文字和链接已完成界面检查，最终 Release 应用已打包并验证签名。
 
 ### 发布准备（1.6.1）
 
-源码使用 [MIT 许可证](LICENSE)，第三方素材按各自许可分发。作者：Fungleo；签名：键鼠请游戏人间 风流谈笑傲江湖；[个人博客](http://fungleo.com)。
+源码使用 [MIT 许可证](LICENSE)，第三方素材按各自许可分发。作者：Fungleo；签名：键鼠轻游戏人间 风流谈笑傲江湖；[个人博客](http://fungleo.com)。
 
 可通过 [GitHub Releases](https://github.com/fengcms/freecell-swift/releases) 分发独立应用，无需 Apple 开发者会员。[1.6.1 下载页](https://github.com/fengcms/freecell-swift/releases/tag/v1.6.1)提供 `FreeCell-1.6.1-macOS-AppleSilicon.dmg` 安装镜像、ZIP 备用包和 SHA-256 校验文件。打开 DMG 后将 FreeCell 拖入“应用程序”即可安装；GitHub 的 Source code 压缩包是源码，不能直接运行。
 

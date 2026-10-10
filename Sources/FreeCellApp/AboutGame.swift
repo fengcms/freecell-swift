@@ -43,7 +43,7 @@ private struct AboutGameView: View {
             Divider().padding(.horizontal, 24)
             VStack(spacing: 10) {
                 Text(L("作者 · Fungleo")).font(.headline)
-                Text("键鼠请游戏人间 风流谈笑傲江湖").environment(\.layoutDirection, .leftToRight)
+                Text("键鼠轻游戏人间 风流谈笑傲江湖").environment(\.layoutDirection, .leftToRight)
                     .font(.system(size: 14, design: .serif))
             }
             VStack(spacing: 10) {
